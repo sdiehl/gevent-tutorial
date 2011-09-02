@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <script src="http://yandex.st/highlightjs/6.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/6.0/styles/github.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Antic' rel='stylesheet' type='text/css'>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <title>Gevent Tutorial</title>
+</head>
+<style>
+    body {
+        font-family: 'Antic', sans-serif;
+    }
+
+    .author {
+        text-align: center;
+    }
+
+    .email {
+        text-align: center;
+        font-size: 10pt;
+    }
+
+    #content {
+        width: 960px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    .green {
+        color: #7c9a5e;
+    }
+</style>
+<body>
+
+<div id="content">
+
+<header>
+    <h1><span class="green">gevent</span> For the Working Python Developer</h1>
+    <h3 class="author">
+        <a href="http://www.stephendiehl.com">Stephen Diehl</a>
+    </h3>
+</header>
+
+<blockquote>
+gevent is a coroutine-based Python networking library that uses greenlet to provide a high-level synchronous API on top of libevent event loop.
+</blockquote>
+
+<section id="intro">
+<header id="intro.intro">
+<h1>Intro</h1>
+
+
+</header>
+</section>
+
+<section id="parallel">
+<h2>Synchronous & Asynchronous Execution</h2>
+
+<p>A somewhat synthetic example</p>
+
+<pre><code class="python">import gevent
+import random
+
+def task(pid):
+    """
+    Some non-deterministic task
+    """
+    gevent.sleep(random.randint(0,2))
+    print 'Task', pid, 'done'
+
+def synchronous():
+    for i in range(1,10):
+        task(i)
+
+def asynchronous():
+    threads = []
+    for i in range(1,10):
+        threads.append(gevent.spawn(task, i))
+    gevent.joinall(threads)
+
+print 'Synchronous:'
+synchronous()
+
+print 'Asynchronous:'
+asynchronous()
+</code>
+</pre>
+
+
+<p>A more common use case, fetching data from a server asynchronously</p>
+
+
+<pre><code class="python">import gevent
+from gevent import Greenlet
+import urllib2
+import simplejson as json
+
+def fetch(pid):
+    response = urllib2.urlopen('http://json-time.appspot.com/time.json')
+    result = response.read()
+    json_result = json.loads(result)
+    datetime = json_result['datetime']
+
+    print 'Process ', pid, datetime
+    return json_result['datetime']
+
+def synchronous():
+    for i in range(1,10):
+        fetch(i)
+
+def asynchronous():
+    threads = []
+    for i in range(1,10):
+        threads.append(gevent.spawn(fetch, i))
+    gevent.joinall(threads)
+
+print 'Synchronous:'
+synchronous()
+
+print 'Asynchronous:'
+asynchronous()
+</code>
+</pre>
+
+</section>
+
+<section id="greenlets">
+<header>
+
+<h2>Holding Side Effects</h2>
+
+In this example we hold the side effects of executing an
+arbitrary string, 
+
+<pre>
+<code class="python">from gevent import Greenlet
+
+def run_code(code, env={}):
+    local = locals()
+    local.update(env)
+    exec(code, globals(), local)
+    return local
+
+env = {}
+
+while True:
+    code = raw_input('>')
+
+    g = Greenlet.spawn(run_code, code, env)
+    g.join() # block until code executes
+
+    # If succesfull then pass the locals to the next command
+    if g.value:
+        env = g.get()
+    else:
+        print g.exception
+</code>
+</pre> 
+
+</header>
+</section>
+
+
+<h2>License</h2>
+
+<p>
+This is a collaborative document published under MIT license. Forking 
+on <a href="https://github.com/sdiehl/gevent_tutorial">GitHub</a> is encouraged
+</p>
+
+</div>
+
+</body>
+</html>
