@@ -13,6 +13,27 @@
         font-family: 'Antic', sans-serif;
     }
 
+    pre {
+        border: 1px solid black;
+        background-color: ghostWhite;
+
+    }
+
+    p code {
+        font-family: monospace;
+        border-bottom: 1px dashed #ccc;
+    }
+
+    .label { 
+        display: block;
+        margin-bottom: 0px;
+        padding: 0px;
+        font-family: sans;
+        font-weight: bold;
+        width: 200px;
+        padding: 0.5em;
+    }
+
     .author {
         text-align: center;
     }
@@ -48,23 +69,60 @@
 </header>
 
 <blockquote>
-gevent is a coroutine-based Python networking library that uses greenlet to provide a high-level synchronous API on top of libevent event loop.
+gevent is a concurrency library based around the libevent API. It provides a clean API for a variety of concurrency and network related tasks.
 </blockquote>
 
 <section id="intro">
 <header id="intro.intro">
+
 <h1>Intro</h1>
 
 
+<p>The structure of this tutorial assumes an intermediate level
+knowledge of Python but not much else. No knowledge of
+concurrency is expected. The goal is to give you
+the tools you need to get going with gevent and use it to solve
+or speed up your applications today.</p>
+
+<p>
+The primary pattern provided by gevent is the <strong>Greenlet</strong>, a
+lightweight coroutine provided to Python as a C extension module.
+Greenlets all run inside of the OS process for the main
+program but are scheduled cooperatively by libevent. This differs from
+<a href="http://docs.python.org/library/subprocess.html">subprocceses</a> 
+in which new processes are spawned by the OS.
+
+At the time of writing, greenlets are only working in Python 2.x .
+</p>
+
 </header>
+
 </section>
 
+
 <section id="parallel">
-<h2>Synchronous & Asynchronous Execution</h2>
 
-<p>A somewhat synthetic example</p>
+<h2>Greenlets</h2>
 
-<pre><code class="python">import gevent
+<h3>Synchronous & Asynchronous Execution</h3>
+
+The core idea of concurrency is that a larger task can be broken
+down into a collection of subtasks whose operation does not
+depend on the other tasks and thus can be sent side-by-side (
+<strong>asynchronously</strong> ) inside of one at a time (
+<strong>synchronously</strong> ). For example our 
+
+<p>
+A somewhat synthetic example defines a <code>task</code> function
+which is <strong>non-deterministic</strong> 
+(i.e. its output is not guaranteed to give the same result for
+the same inputs). In this case the side effect of running the
+function is that the task pauses its execution for a random
+number of seconds.
+</p>
+
+<pre>
+<code class="python">import gevent
 import random
 
 def task(pid):
@@ -92,9 +150,64 @@ asynchronous()
 </code>
 </pre>
 
+<p>
+In the synchronous case all the tasks are run sequentially,
+which results in the main programming <strong>blocking</strong> (
+i.e. pausing the execution of the main program )
+while each task executes.
+</p>
 
-<p>A more common use case, fetching data from a server asynchronously</p>
+The important parts of the program are the
+<code>gevent.spawn</code> which wraps up the given function
+inside of a Greenlet thread. The list of initialized greenlets 
+are stored in the array <code>threads</code> which is passed to
+the <code>gevent.joinall</code> function which blocks the current
+program to run all the given greenlets. The execution will step
+forward only when all the greenlets terminate.
 
+<p>The output is:</p>
+
+<pre>
+<code>
+Synchronous:
+Task 1 done
+Task 2 done
+Task 3 done
+Task 4 done
+Task 5 done
+Task 6 done
+Task 7 done
+Task 8 done
+Task 9 done
+Task 10 done
+Asynchronous:
+Task 2 done
+Task 3 done
+Task 5 done
+Task 6 done
+Task 8 done
+Task 6 done
+Task 9 done
+Task 1 done
+Task 4 done
+Task 7 done
+</code>
+</pre>
+
+<p>
+The important fact to notice is that the order of execution in
+the async case is essentially random and that the total execution
+time in the async case is much less than the sync case. In fact
+the maximum time for the synchronous case to complete is when
+each tasks pauses for 2 seconds resulting in a 20 seconds for the
+whole queue. In the async case the maximum runtime is roughly 2
+seconds since none of the tasks block the execution of the
+others.
+</p>
+
+<p>A more common use case, fetching data from a server
+asynchronously, the runtime of <code>fetch()</code> will differ between
+requests given the load on the remote server.</p>
 
 <pre><code class="python">import gevent
 from gevent import Greenlet
@@ -133,7 +246,7 @@ asynchronous()
 <section id="greenlets">
 <header>
 
-<h2>Holding Side Effects</h2>
+<h3>Holding Side Effects</h3>
 
 In this example we hold the side effects of executing an
 arbitrary string, 
@@ -167,7 +280,7 @@ while True:
 </section>
 
 
-<h2>License</h2>
+<h3>License</h3>
 
 <p>
 This is a collaborative document published under MIT license. Forking 
