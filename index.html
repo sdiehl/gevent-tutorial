@@ -91,8 +91,6 @@ Greenlets all run inside of the OS process for the main
 program but are scheduled cooperatively by libevent. This differs from
 <a href="http://docs.python.org/library/subprocess.html">subprocceses</a> 
 in which new processes are spawned by the OS.
-
-At the time of writing, greenlets are only working in Python 2.x .
 </p>
 
 </header>
@@ -210,7 +208,6 @@ asynchronously, the runtime of <code>fetch()</code> will differ between
 requests given the load on the remote server.</p>
 
 <pre><code class="python">import gevent
-from gevent import Greenlet
 import urllib2
 import simplejson as json
 
@@ -241,6 +238,160 @@ asynchronous()
 </code>
 </pre>
 
+<h3>Race Conditions</h3>
+
+<p>The perennial problem involved with concurrency is known as a
+<b>race condition</b>. Simply put is when two concurrent threads
+/ processes depend on some shared resource but also attempt to
+modify this value. This results in resources whose values become
+time-dependent on the execution order. This is a problem, and in
+general one should very much try to avoid race conditions since
+they result program behavior which is globally non-deterministic.</p>
+
+<p>One approach to avoiding race conditions is to simply not
+have any global <b>state</b> shared between threads. To
+communicate threads instead pass stateless messages between each 
+other.</p>
+
+</section>
+
+<section>
+<h3>Spawning threads</h3>
+
+gevent provides a few wrappers around Greenlet initialization.
+Some of the most common patterns are:
+
+<pre>
+<code class="python">import gevent
+from gevent import Greenlet
+
+def foo(message, n):
+    """
+    Each thread will be passed the message, and n arguments
+    in its initialization.
+    """
+    print 'I live!'
+    gevent.sleep(3)
+
+# Initialize a new Greenlet instance running the named function
+# foo
+thread1 = Greenlet.spawn(foo, "Hello", 1)
+thread1.start()
+
+# Wrapper for creating and runing a new Greenlet from the named 
+# function foo, with the passd arguments
+thread2 = gevent.spawn(foo, "I live!", 2)
+
+# Lambda expressions
+thread3 = gevent.spawn(lambda x: (x+1), 2)
+
+threads = [thread1, thread2, thread3]
+
+# Block until all threads complete.
+gevent.joinall(threads)
+
+</code>
+</pre>
+</section>
+
+<!-- ================================================= -->
+
+<section>
+<h3>Greenlet State</h3>
+
+<p>Like any other segement of code Greenlets can fail in various
+ways. A greenlet may fail throw an exception, fail to halt or
+consume too many system resources.</p>
+
+<p>The internal state of a greenlet is generally a time-depenent
+parameter. There are a number of flags on greenlets which let
+you monitor the state of the thread</p>
+
+<ul>
+    <li><code>started</code> -- Boolean, indicates whether the Greenlet has been started. </li>
+    <li><code>ready()</code> -- Boolean, indicates whether the Greenlet has halted</li>
+    <li><code>successful()</code> -- Boolean, indicates whether the Greenlet has halted and not thrown an exception</li>
+    <li><code>value</code> -- arbitrary, the value returned by the Greenlet</li>
+    <li><code>exception</code> -- exception, uncaught exception instance thrown inside the greenlet</li>
+</ul>
+
+<p>
+Greenlets that fail to yield when the main program receives a
+SIGQUIT may hold the program's execution longer than expected.
+This results in so called "zombie processes" which need to be
+killed from outside of the Python interpreter.
+</p>
+
+A common pattern is to listen SIGQUIT events on the main program
+and to invoke <code>gevent.killall</code> before exit.
+
+<pre>
+<code class="python">import gevent
+
+def run_forever():
+    while True:
+        pass
+
+def main():
+    thread = gevent.spawn(run_forever)
+    gevent.joinall([thread])
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        gevent.killall()
+</code>
+</pre>
+
+<section>
+<h3>Timeouts</h3>
+
+</section>
+
+<!-- ================================================= -->
+
+<!-- ================================================= -->
+
+<section>
+<h2>Data Structures</h2>
+<h3>Data Structures</h3>
+
+Events are a form of asynchronous communication between
+Greenlets.
+
+<code class="python">import gevent
+</code>
+
+</section>
+
+<!-- ================================================= -->
+
+<section>
+<h3>Queues</h3>
+
+<code class="python">
+</code>
+
+</section>
+
+<!-- ================================================= -->
+
+<section>
+<h3>Locks and Semaphores</h3>
+
+<code class="python">
+</code>
+
+</section>
+
+<!-- ================================================= -->
+
+<section>
+<h3>Actor Model</h3>
+The actor model is a higher level concurrency model popularized
+by the language Erlang. In short the model revolves around
+communication between a series 
 </section>
 
 <section id="greenlets">
@@ -279,6 +430,17 @@ while True:
 </header>
 </section>
 
+<section>
+<h3>WSGI Servers</h3>
+</section>
+
+<section>
+<h3>Long Polling</h3>
+</section>
+
+<section>
+<h3>Real world Example: Chat Server</h3>
+</section>
 
 <h3>License</h3>
 
