@@ -69,7 +69,7 @@
 </header>
 
 <blockquote>
-gevent is a concurrency library based around the libevent API. It provides a clean API for a variety of concurrency and network related tasks.
+gevent is a concurrency library based around libev.  It provides a clean API for a variety of concurrency and network related tasks.
 </blockquote>
 
 <section id="intro">
@@ -270,8 +270,8 @@ def foo(message, n):
     Each thread will be passed the message, and n arguments
     in its initialization.
     """
-    print 'I live!'
-    gevent.sleep(3)
+    print message
+    gevent.sleep(n)
 
 # Initialize a new Greenlet instance running the named function
 # foo
