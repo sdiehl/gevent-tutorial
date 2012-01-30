@@ -11,6 +11,7 @@
 <style>
     body {
         font-family: 'Antic', sans-serif;
+        font-size: 12pt;
     }
 
     pre {
@@ -289,9 +290,34 @@ threads = [thread1, thread2, thread3]
 
 # Block until all threads complete.
 gevent.joinall(threads)
-
 </code>
 </pre>
+
+<p>
+In addition to using the base Greenlet class, you may also subclass
+Greenlet class and overload the <code>_run</code> method.
+</p>
+
+<pre>
+<code class="python">from gevent import Greenlet
+
+class MyGreenlet(Greenlet):
+
+    def __init__(self, message, n):
+        Greenlet.__init__(self)
+        self.message = message
+        self.n = n
+
+    def _run(self):
+        print self.message
+        gevent.sleep(self.n)
+
+g = MyGreenlet("Hi there!", 3)
+g.start()
+g.join()
+</code>
+</pre>
+
 </section>
 
 <!-- ================================================= -->
@@ -360,8 +386,12 @@ if __name__ == '__main__':
 Events are a form of asynchronous communication between
 Greenlets.
 
-<code class="python">import gevent
+<!--
+<pre>
+<code class="python">
 </code>
+</pre>
+-->
 
 </section>
 
@@ -390,8 +420,7 @@ Greenlets.
 <section>
 <h3>Actor Model</h3>
 The actor model is a higher level concurrency model popularized
-by the language Erlang. In short the model revolves around
-communication between a series 
+by the language Erlang.
 </section>
 
 <section id="greenlets">
