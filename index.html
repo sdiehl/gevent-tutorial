@@ -146,6 +146,7 @@
             <li>Queues</li>
             <li>Locks and Sempahores</li>
             <li>Actor Model</li>
+            <li>Groups and Pools</li>
         </ul>
 
     </li>
@@ -194,7 +195,7 @@ lightweight coroutine provided to Python as a C extension module.
 Greenlets all run inside of the OS process for the main
 program but are scheduled cooperatively by libevent. This differs from
 <a href="http://docs.python.org/library/subprocess.html">subprocceses</a> 
-in which new processes are spawned by the OS.
+which are new processes are spawned by the OS.
 </p>
 
 </header>
@@ -476,7 +477,75 @@ if __name__ == '__main__':
 <section>
 <h3>Timeouts</h3>
 
+Timeouts are a constraint on the runtime of a block of code or a
+Greenlet.
+
+<pre>
+<code class="python">
+from gevent import Timeout
+
+time_to_wait = 5 # seconds
+
+timeout = Timeout(seconds)
+timeout.start()
+
+def wait():
+    gevent.sleep(10)
+
+try:
+    gevent.spawn(wait).join()
+except Timeout:
+    print 'Could not complete'
+
+</code>
+</pre>
+
+Or with a context manager in a <code>with</code> a statement.
+
+<pre>
+<code class="python">import gevent
+from gevent import Timeout
+
+time_to_wait = 5 # seconds
+
+class TooLong(Exception):
+    pass
+
+with Timeout(time_to_wait, TooLong):
+    gevent.sleep(10)
+</code>
+</pre>
+
 </section>
+
+In addition, gevent also provides a timeout arguments for a
+variety of Greenlet and data stucture related calls. For example:
+varius
+
+<pre>
+<code class="python">import gevent
+from gevent import Timeout
+
+def wait():
+    gevent.sleep(2)
+
+timer = Timeout(1).start()
+
+thread1 = gevent.spawn(wait)
+thread1.join(timeout=timer)
+
+# --
+
+timer = Timeout.start_new(1)
+
+thread2 = gevent.spawn(wait)
+thread2.get(timeout=timer)
+
+# --
+
+gevent.with_timeout(1, wait)
+</code>
+</pre>
 
 <!-- ================================================= -->
 
@@ -484,6 +553,8 @@ if __name__ == '__main__':
 
 <section id="structures">
 <h2>Data Structures</h2>
+
+<h3>Events</h3>
 
 Events are a form of asynchronous communication between
 Greenlets.
@@ -511,6 +582,16 @@ Greenlets.
 
 <section>
 <h3>Locks and Semaphores</h3>
+
+<code class="python">
+</code>
+
+</section>
+
+<!-- ================================================= -->
+
+<section>
+<h3>Groups and Pools</h3>
 
 <code class="python">
 </code>
@@ -566,6 +647,25 @@ while True:
 
 <section>
 <h3>WSGI Servers</h3>
+
+<pre>
+<code class="python">from gevent.pywsgi import WSGIServer
+
+def application(environ, start_response):
+    status = '200 OK'
+    body = 'Hello Cruel World!'
+
+    headers = [
+        ('Content-Type', 'text/html')
+    ]
+
+    start_response(status, headers)
+    return [body]
+
+WSGIServer(('', 8000), application).serve_forever()
+</code>
+</pre> 
+
 </section>
 
 <section>
