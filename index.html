@@ -211,9 +211,9 @@ which are new processes are spawned by the OS.
 
 The core idea of concurrency is that a larger task can be broken
 down into a collection of subtasks whose operation does not
-depend on the other tasks and thus can be sent side-by-side (
-<strong>asynchronously</strong> ) inside of one at a time (
-<strong>synchronously</strong> ). For example our 
+depend on the other tasks and thus can be run side-by-side (
+<strong>asynchronously</strong> ) instead of one at a time (
+<strong>synchronously</strong> ). For example:
 
 <p>
 A somewhat synthetic example defines a <code>task</code> function
@@ -518,9 +518,8 @@ with Timeout(time_to_wait, TooLong):
 
 </section>
 
-In addition, gevent also provides a timeout arguments for a
+In addition, gevent also provides timeout arguments for a
 variety of Greenlet and data stucture related calls. For example:
-varius
 
 <pre>
 <code class="python">import gevent
