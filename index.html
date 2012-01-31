@@ -4,25 +4,87 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <script src="http://yandex.st/highlightjs/6.0/highlight.min.js"></script>
     <link rel="stylesheet" href="http://yandex.st/highlightjs/6.0/styles/github.min.css">
-    <link href='http://fonts.googleapis.com/css?family=Antic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Droid+Serif:400,400italic|Inconsolata' rel='stylesheet'>
     <script>hljs.initHighlightingOnLoad();</script>
     <title>Gevent Tutorial</title>
 </head>
 <style>
     body {
-        font-family: 'Antic', sans-serif;
-        font-size: 12pt;
+        font: 13px/20px "Droid Sans",Arial,"Helvetica Neue","Lucida Grande",sans-serif;
+
+        color: #4C4C4C;
+        background-color: #c9dbb2;
+        margin-left: 0px;
+        margin-top: 5px;
+    }
+
+    aside {
+        position: fixed;
+        float: left;
+        width: 150px;
+
+        background-color: #FAFBFC;
+        border: 1px solid #FAFBFC;
+
+        -webkit-border-top-right-radius: 10px;
+        -webkit-border-bottom-right-radius: 10px;
+        -moz-border-radius-topright: 10px;
+        -moz-border-radius-bottomright: 10px;
+
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+
+        padding-left: 5px;
+        height: 100%;
+    }
+
+    aside ul {
+        margin: 0px;
+        padding: 0px;
+        list-style-type: none;
+    }
+
+    aside ul ul {
+        font-size: 80%;
+        padding-left: 5px;
+    }
+
+    #content {
+        max-width: 960px;
+        margin-left: 160px;
+        padding: 10px;
+        border: 1px solid #FAFBFC;
+
+        background-color: #FAFBFC;
+
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+       
+        -webkit-box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.5);
+        -moz-box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.5);
+        box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.5);
+    }
+
+    a {
+        color: inherit;
     }
 
     pre {
-        border: 1px solid black;
+        border: 1px solid #ccc;
         background-color: ghostWhite;
+        font: 15px/19px Inconsolata,"Lucida Console",Terminal,"Courier New",Courier;
 
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+        padding: 5px;
     }
 
     p code {
         font-family: monospace;
         border-bottom: 1px dashed #ccc;
+
     }
 
     .label { 
@@ -44,14 +106,14 @@
         font-size: 10pt;
     }
 
-    #content {
-        width: 960px;
-        margin-left: auto;
-        margin-right: auto;
-    }
 
     h1 {
         text-align: center;
+        padding-bottom: 5px;
+    }
+
+    h2 {
+        padding-bottom: 10px;
     }
 
     .green {
@@ -59,6 +121,47 @@
     }
 </style>
 <body>
+
+
+<aside>
+<ul>
+    <h3>Contents</h3>
+    <li>
+        <a href="#intro">
+            Introduction
+        </a>
+    </li>
+    <li>
+        <a href="#parallel">
+            Greenlets
+        </a>
+    </li>
+    <li>
+        <a href="#structures">
+            Data Structures
+        </a>
+
+        <ul>
+            <li>Events</li>
+            <li>Queues</li>
+            <li>Locks and Sempahores</li>
+            <li>Actor Model</li>
+        </ul>
+
+    </li>
+    <li>
+        <a href="#applications">
+            Real World Applications
+        </a>
+        <ul>
+            <li>Holding Side Effects</li>
+            <li>WSGI Servers</li>
+            <li>Long Polling</li>
+            <li>Chat Server</li>
+        </ul>
+    </li>
+</ul>
+</aside>
 
 <div id="content">
 
@@ -379,9 +482,8 @@ if __name__ == '__main__':
 
 <!-- ================================================= -->
 
-<section>
+<section id="structures">
 <h2>Data Structures</h2>
-<h3>Data Structures</h3>
 
 Events are a form of asynchronous communication between
 Greenlets.
@@ -423,8 +525,11 @@ The actor model is a higher level concurrency model popularized
 by the language Erlang.
 </section>
 
-<section id="greenlets">
-<header>
+<h2>Real World Applications</h2>
+
+<section id="applications">
+
+<section>
 
 <h3>Holding Side Effects</h3>
 
@@ -456,8 +561,8 @@ while True:
 </code>
 </pre> 
 
-</header>
 </section>
+
 
 <section>
 <h3>WSGI Servers</h3>
@@ -468,7 +573,9 @@ while True:
 </section>
 
 <section>
-<h3>Real world Example: Chat Server</h3>
+<h3>Chat Server</h3>
+</section>
+
 </section>
 
 <h3>License</h3>
