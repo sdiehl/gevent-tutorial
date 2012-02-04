@@ -124,44 +124,50 @@
 
 
 <aside>
-<ul>
-    <h3>Contents</h3>
-    <li>
-        <a href="#intro">
-            Introduction
-        </a>
-    </li>
-    <li>
-        <a href="#parallel">
-            Greenlets
-        </a>
-    </li>
-    <li>
-        <a href="#structures">
-            Data Structures
-        </a>
+    <ul>
+        <h3>Contents</h3>
+        <li>
+            <a href="#intro">
+                Introduction
+            </a>
+        </li>
+        <li>
+            <a href="#parallel">
+                Greenlets
+            </a>
+        </li>
+        <li>
+            <a href="#structures">
+                Data Structures
+            </a>
 
-        <ul>
-            <li>Events</li>
-            <li>Queues</li>
-            <li>Locks and Sempahores</li>
-            <li>Actor Model</li>
-            <li>Groups and Pools</li>
-        </ul>
+            <ul>
+                <li>Events</li>
+                <li>Queues</li>
+                <li>Locks and Sempahores</li>
+                <li>Actor Model</li>
+                <li>Groups and Pools</li>
+            </ul>
 
-    </li>
-    <li>
-        <a href="#applications">
-            Real World Applications
-        </a>
-        <ul>
-            <li>Holding Side Effects</li>
-            <li>WSGI Servers</li>
-            <li>Long Polling</li>
-            <li>Chat Server</li>
-        </ul>
-    </li>
-</ul>
+        </li>
+        <li>
+            <a href="#applications">
+                Real World Applications
+            </a>
+            <ul>
+                <li>Holding Side Effects</li>
+                <li>WSGI Servers</li>
+                <li>Long Polling</li>
+                <li>Chat Server</li>
+            </ul>
+        </li>
+
+        <h3>Other Resources</h3>
+
+        <li>
+            <a href="http://www.gevent.org/contents.html">Gevent Docs</a>
+        </li>
+    </ul>
 </aside>
 
 <div id="content">
@@ -177,8 +183,8 @@
 gevent is a concurrency library based around libev.  It provides a clean API for a variety of concurrency and network related tasks.
 </blockquote>
 
+<!-- ================================================= -->
 <section id="intro">
-<header id="intro.intro">
 
 <h1>Intro</h1>
 
@@ -198,11 +204,10 @@ program but are scheduled cooperatively by libevent. This differs from
 which are new processes are spawned by the OS.
 </p>
 
-</header>
-
 </section>
+<!-- ================================================= -->
 
-
+<!-- ================================================= -->
 <section id="parallel">
 
 <h2>Greenlets</h2>
@@ -360,6 +365,7 @@ other.</p>
 
 </section>
 
+<!-- ================================================= -->
 <section>
 <h3>Spawning threads</h3>
 
@@ -445,6 +451,49 @@ you monitor the state of the thread</p>
     <li><code>exception</code> -- exception, uncaught exception instance thrown inside the greenlet</li>
 </ul>
 
+<pre>
+<code class="python">import gevent
+
+def win():
+    return 'You win!'
+
+def fail():
+    raise Exception('You fail at failing.')
+
+winner = gevent.spawn(win)
+loser = gevent.spawn(fail)
+
+print winner.started # True
+print loser.started  # True
+
+# Exceptions raised in the Greenlet, stay inside the Greenlet.
+try:
+    gevent.joinall([winner, loser])
+except Exception as e:
+    print 'This will never be reached'
+
+print winner.value # 'You win!'
+print loser.value  # None
+
+print winner.ready() # True
+print loser.ready()  # True
+
+print winner.successful() # True
+print loser.successful()  # False
+
+# The exception raised in fail, will not propogate outside the
+# greenlet. A stack trace will be printed to stdout but it
+# will not unwind the stack of the parent.
+
+print loser.exception
+
+# It is possible though to raise the exception again outside
+raise loser.exception
+# or with
+loser.get()
+</code>
+</pre>
+
 <p>
 Greenlets that fail to yield when the main program receives a
 SIGQUIT may hold the program's execution longer than expected.
@@ -453,26 +502,28 @@ killed from outside of the Python interpreter.
 </p>
 
 A common pattern is to listen SIGQUIT events on the main program
-and to invoke <code>gevent.killall</code> before exit.
+and to invoke <code>gevent.shutdown</code> before exit.
 
 <pre>
 <code class="python">import gevent
 
 def run_forever():
-    while True:
-        pass
+    gevent.sleep(1000)
 
 def main():
     thread = gevent.spawn(run_forever)
-    gevent.joinall([thread])
 
 if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        gevent.killall()
+        gevent.shutdown()
 </code>
 </pre>
+
+</section>
+
+<!-- ================================================= -->
 
 <section>
 <h3>Timeouts</h3>
@@ -514,7 +565,7 @@ with Timeout(time_to_wait, TooLong):
 </code>
 </pre>
 
-</section>
+<!-- ================================================= -->
 
 In addition, gevent also provides timeout arguments for a
 variety of Greenlet and data stucture related calls. For example:
@@ -544,7 +595,7 @@ gevent.with_timeout(1, wait)
 </code>
 </pre>
 
-<!-- ================================================= -->
+</section>
 
 <!-- ================================================= -->
 
@@ -570,8 +621,103 @@ Greenlets.
 <section>
 <h3>Queues</h3>
 
-<code class="python">
+<p>Queues are ordered sets of data that have the usual put / get
+operations but are written in a way such that they can be safely
+manipulated across Greenlets.</p>
+
+<p>
+For example if one Greenlet grabs an item off of the queue, the
+same item will not grabbed by another Greenlet executing
+simultaneously.
+</p>
+
+<pre>
+<code class="python">import gevent
+from gevent.queue import Queue
+
+tasks = Queue()
+
+def worker(n):
+    while not tasks.empty():
+        task = tasks.get()
+        print 'Worker %s got task %s' % (n, task)
+        gevent.sleep(0.5)
+
+    print 'Quitting time!'
+
+def boss():
+    for i in xrange(1,25):
+        tasks.put_nowait(i)
+
+gevent.spawn(boss).join()
+
+gevent.joinall([
+    gevent.spawn(worker, 'steve'),
+    gevent.spawn(worker, 'john'),
+    gevent.spawn(worker, 'nancy'),
+])
 </code>
+</pre>
+
+<p>
+Queues can also block on either put or get as the need arises. 
+
+Each of the put and get operations has a non-blocking
+counterpart, <code>put_nowait</code> and 
+<code>get_nowait</code> which will not block, but instead raise
+either <code>gevent.queue.Empty</code> or
+<code>gevent.queue.Full</code> in the operation is not possible.
+</p>
+
+<p>
+In this example we have the boss running simultaneously to the
+workers and have a restriction on the Queue that it can cantain no
+more than three elements. This restriction means that the <code>put</code>
+operation will block until there is space on the queue.
+Conversely the <code>get</code> operation will block if there are
+no elements on the queue to fetch, it also takes a timeout
+argument to allow for the queue to exit with the exception
+<code>gevent.queue.Empty</code> if no work can found within the
+time frame of the Timeout.
+</p>
+
+<pre>
+<code class="python">import gevent
+from gevent.queue import Queue, Empty
+
+tasks = Queue(maxsize=3)
+
+def worker(n):
+    try:
+        while True:
+            task = tasks.get(timeout=1) # decrements queue size by 1
+            print 'Worker %s got task %s' % (n, task)
+            gevent.sleep(0.5)
+    except Empty:
+        print 'Quitting time!'
+
+def boss():
+    """
+    Boss will wait to hand out work until a individual worker is
+    free since the maxsize of the task queue is 3.
+    """
+
+    for i in xrange(1,10):
+        tasks.put(i)
+    print 'Assigned all work in iteration 1'
+
+    for i in xrange(10,20):
+        tasks.put(i)
+    print 'Assigned all work in iteration 2'
+
+gevent.joinall([
+    gevent.spawn(boss),
+    gevent.spawn(worker, 'steve'),
+    gevent.spawn(worker, 'john'),
+    gevent.spawn(worker, 'bob'),
+])
+</code>
+</pre>
 
 </section>
 
@@ -599,15 +745,77 @@ Greenlets.
 
 <section>
 <h3>Actor Model</h3>
+
+<p>
 The actor model is a higher level concurrency model popularized
-by the language Erlang.
+by the language Erlang. In short the main idea is that you have a
+collection of independent Actors which have an inbox from which
+they receive messages from other Actors. The main loop inside the
+Actor iterates through its messages and takes action acording to
+its desired behavior. 
+</p>
+
+<p>
+Gevent does not have a primitive Actor type, but we can define
+one very simply using a Queue inside of a subclassed Greenlet.
+</p>
+
+<pre>
+<code class="python">
+class Actor(gevent.Greenlet):
+
+    def __init__(self):
+        self.inbox = queue.Queue()
+        Greenlet.__init__(self)
+
+    def recieve(self, message):
+        """
+        Define in your subclass.
+        """
+        raise NotImplemented()
+
+    def _run(self):
+        self.running = True
+
+        while self.running:
+            message = self.inbox.get()
+            self.recieve(message)
+
+</code>
+</pre>
+
+In a use case:
+
+<pre>
+<code class="python">
+class Echo(Actor):
+    def recieve(self, message):
+        print message
+
+class Speaker():
+    def recieve(self, message):
+        if message == 'start':
+            for i in xrange(1,5):
+                echo.inbox.put('Hey there!')
+
+echo = Echo()
+speak = Speaker()
+
+echo.start()
+speak.start()
+
+speak.inbox.put('start')
+gevent.joinall([echo, speak])
+</code>
+</pre>
+
 </section>
+
+<!-- ================================================= -->
 
 <h2>Real World Applications</h2>
 
 <section id="applications">
-
-<section>
 
 <h3>Holding Side Effects</h3>
 
@@ -617,13 +825,13 @@ arbitrary string,
 <pre>
 <code class="python">from gevent import Greenlet
 
+env = {}
+
 def run_code(code, env={}):
     local = locals()
     local.update(env)
     exec(code, globals(), local)
     return local
-
-env = {}
 
 while True:
     code = raw_input('>')
