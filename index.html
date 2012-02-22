@@ -144,7 +144,7 @@
             <ul>
                 <li>Events</li>
                 <li>Queues</li>
-                <li>Locks and Sempahores</li>
+                <li>Locks and Semaphores</li>
                 <li>Actor Model</li>
                 <li>Groups and Pools</li>
             </ul>
@@ -439,7 +439,7 @@ g.join()
 ways. A greenlet may fail throw an exception, fail to halt or
 consume too many system resources.</p>
 
-<p>The internal state of a greenlet is generally a time-depenent
+<p>The internal state of a greenlet is generally a time-dependent
 parameter. There are a number of flags on greenlets which let
 you monitor the state of the thread</p>
 
@@ -621,7 +621,7 @@ Greenlets.
 <section>
 <h3>Queues</h3>
 
-<p>Queues are ordered sets of data that have the usual put / get
+<p>Queues are ordered sets of data that have the usual <code>put</code> / <code>get</code>
 operations but are written in a way such that they can be safely
 manipulated across Greenlets.</p>
 
@@ -660,9 +660,9 @@ gevent.joinall([
 </pre>
 
 <p>
-Queues can also block on either put or get as the need arises. 
+Queues can also block on either <code>put</code> or <code>get</code> as the need arises. 
 
-Each of the put and get operations has a non-blocking
+Each of the <code>put</code> and <code>get</code> operations has a non-blocking
 counterpart, <code>put_nowait</code> and 
 <code>get_nowait</code> which will not block, but instead raise
 either <code>gevent.queue.Empty</code> or
@@ -671,7 +671,7 @@ either <code>gevent.queue.Empty</code> or
 
 <p>
 In this example we have the boss running simultaneously to the
-workers and have a restriction on the Queue that it can cantain no
+workers and have a restriction on the Queue that it can contain no
 more than three elements. This restriction means that the <code>put</code>
 operation will block until there is space on the queue.
 Conversely the <code>get</code> operation will block if there are
@@ -751,7 +751,7 @@ The actor model is a higher level concurrency model popularized
 by the language Erlang. In short the main idea is that you have a
 collection of independent Actors which have an inbox from which
 they receive messages from other Actors. The main loop inside the
-Actor iterates through its messages and takes action acording to
+Actor iterates through its messages and takes action according to
 its desired behavior. 
 </p>
 
