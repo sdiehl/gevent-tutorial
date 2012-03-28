@@ -214,11 +214,37 @@ which are new processes are spawned by the OS.
 
 <h3>Synchronous & Asynchronous Execution</h3>
 
-The core idea of concurrency is that a larger task can be broken
+<p>The core idea of concurrency is that a larger task can be broken
 down into a collection of subtasks whose operation does not
 depend on the other tasks and thus can be run side-by-side (
 <strong>asynchronously</strong> ) instead of one at a time (
-<strong>synchronously</strong> ). For example:
+<strong>synchronously</strong> ). A switch between the two
+executions is known as a <strong>context swtich</strong>. </p>
+
+<p>A context switch in gevent done through
+<strong>yielding</strong>. In this case example we have
+two contexts which yield to each other through invoking 
+<code> gevent.sleep(0) </code>. </p>
+
+<pre>
+<code class="python">import gevent
+
+def foo():
+    print 'Running in foo'
+    gevent.sleep(0)
+    print 'Emplict context switch to foo again'
+
+def bar():
+    print 'Emplict context to bar'
+    gevent.sleep(0)
+    print 'Implicit swtich switch back to bar'
+
+gevent.joinall([
+    gevent.spawn(foo),
+    gevent.spawn(bar),
+])
+</code>
+</pre>
 
 <p>
 A somewhat synthetic example defines a <code>task</code> function
@@ -245,9 +271,7 @@ def synchronous():
         task(i)
 
 def asynchronous():
-    threads = []
-    for i in range(1,10):
-        threads.append(gevent.spawn(task, i))
+    threads = [gevent.spawn(task, i) for in xrange(10]
     gevent.joinall(threads)
 
 print 'Synchronous:'
@@ -317,7 +341,10 @@ others.
 asynchronously, the runtime of <code>fetch()</code> will differ between
 requests given the load on the remote server.</p>
 
-<pre><code class="python">import gevent
+<pre><code class="python">import gevent.monkey
+gevent.monkey.patch_socket()
+
+import gevent
 import urllib2
 import simplejson as json
 
@@ -381,8 +408,8 @@ def foo(message, n):
     Each thread will be passed the message, and n arguments
     in its initialization.
     """
-    print message
     gevent.sleep(n)
+    print message
 
 # Initialize a new Greenlet instance running the named function
 # foo
@@ -506,18 +533,15 @@ and to invoke <code>gevent.shutdown</code> before exit.
 
 <pre>
 <code class="python">import gevent
+import signal
 
 def run_forever():
     gevent.sleep(1000)
 
-def main():
-    thread = gevent.spawn(run_forever)
-
 if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        gevent.shutdown()
+    gevent.signal(signal.SIGQUIT, gevent.shutdown)
+    thread = gevent.spawn(run_forever)
+    thread.join()
 </code>
 </pre>
 
@@ -534,6 +558,8 @@ Greenlet.
 <pre>
 <code class="python">
 from gevent import Timeout
+
+seconds = 10
 
 timeout = Timeout(seconds)
 timeout.start()
@@ -612,7 +638,8 @@ Greenlets.
 <pre>
 <code class="python">import gevent
 from gevent.event import AsyncResult
-a = Event()
+
+a = AsyncResult()
 
 def setter():
     """
@@ -924,6 +951,14 @@ def application(environ, start_response):
     return [body]
 
 WSGIServer(('', 8000), application).serve_forever()
+</code>
+</pre> 
+
+Performance on Gevent servers is phenomenal.
+
+<pre>
+<code class="shell">from gevent.pywsgi import WSGIServer
+$ ab -n 10000 -c 100 http://127.0.0.1:8000/
 </code>
 </pre> 
 
