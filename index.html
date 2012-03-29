@@ -199,7 +199,7 @@ or speed up your applications today.</p>
 The primary pattern provided by gevent is the <strong>Greenlet</strong>, a
 lightweight coroutine provided to Python as a C extension module.
 Greenlets all run inside of the OS process for the main
-program but are scheduled cooperatively by libevent. This differs from
+program but are scheduled cooperatively by libev. This differs from
 <a href="http://docs.python.org/library/subprocess.html">subprocceses</a> 
 which are new processes are spawned by the OS.
 </p>
@@ -827,7 +827,7 @@ gevent.joinall([
 <!-- ================================================= -->
 
 <section>
-<h3>Actor Model</h3>
+<h3>Actors</h3>
 
 <p>
 The actor model is a higher level concurrency model popularized
@@ -844,7 +844,8 @@ one very simply using a Queue inside of a subclassed Greenlet.
 </p>
 
 <pre>
-<code class="python">
+<code class="python">import gevent
+
 class Actor(gevent.Greenlet):
 
     def __init__(self):
@@ -870,25 +871,30 @@ class Actor(gevent.Greenlet):
 In a use case:
 
 <pre>
-<code class="python">
-class Echo(Actor):
+<code class="python">import gevent
+from gevent.queue import Queue
+from gevent import Greenlet
+
+class Pinger(Actor):
     def recieve(self, message):
         print message
+        pong.inbox.put('ping')
+        gevent.sleep(0)
 
-class Speaker():
+class Ponger(Actor):
     def recieve(self, message):
-        if message == 'start':
-            for i in xrange(1,5):
-                echo.inbox.put('Hey there!')
+        print message
+        ping.inbox.put('pong')
+        gevent.sleep(0)
 
-echo = Echo()
-speak = Speaker()
+ping = Pinger()
+pong = Ponger()
 
-echo.start()
-speak.start()
+ping.start()
+pong.start()
 
-speak.inbox.put('start')
-gevent.joinall([echo, speak])
+ping.inbox.put('start')
+gevent.joinall([ping, pong])
 </code>
 </pre>
 
@@ -957,8 +963,7 @@ WSGIServer(('', 8000), application).serve_forever()
 Performance on Gevent servers is phenomenal.
 
 <pre>
-<code class="shell">from gevent.pywsgi import WSGIServer
-$ ab -n 10000 -c 100 http://127.0.0.1:8000/
+<code class="shell">$ ab -n 10000 -c 100 http://127.0.0.1:8000/
 </code>
 </pre> 
 
