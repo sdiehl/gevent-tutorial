@@ -1,7 +1,53 @@
 Online Version: http://sdiehl.github.com/gevent-tutorial/
 =========================================================
 
-Released under MIT License, feel free to fork!
+Want to add an example. Its uber simple.
+
+1) Fork the repo.
+2) ``pip install -r requirements.txt``
+3) Edit ``tutorial.md``.
+
+Add your text as Markdown.
+
+Add your code as Cog:
+
+     [[[cog
+
+     print("Hello World!")
+     for i in xrange(25):
+         print(i)
+
+     ]]]
+     [[[end]]]
+
+
+Will output this as html:
+
+    <pre>
+    <code class="python">
+
+    print("Hello World!")
+    for i in xrange(5):
+        print(i)
+
+    </code>
+    </pre>
+
+    <pre><code class="python">
+    Hello World!
+    0
+    1
+    2
+    3
+    4
+    </code>
+    </pre>
+
+4) Run ``./build.sh``
+5) Issue pull request.
+6) Get good gevent karma.
+
+Released under MIT License.
 
     Copyright (c) 2011 Stephen Diehl, <stephen.m.diehl@gmail.com>
 
