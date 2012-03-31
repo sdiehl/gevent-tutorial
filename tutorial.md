@@ -1,195 +1,36 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <script src="http://yandex.st/highlightjs/6.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="http://yandex.st/highlightjs/6.0/styles/github.min.css">
-    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Droid+Serif:400,400italic|Inconsolata' rel='stylesheet'>
-    <script>hljs.initHighlightingOnLoad();</script>
-    <title>Gevent Tutorial</title>
-</head>
-<style>
-    body {
-        font: 13px/20px "Droid Sans",Arial,"Helvetica Neue","Lucida Grande",sans-serif;
+[TOC]
 
-        color: #4C4C4C;
-        background-color: #c9dbb2;
-        margin-left: 0px;
-        margin-top: 5px;
-    }
+# Core
 
-    .toc {
-        left: 0px;
-        top: 5px;
-        position: fixed;
-        float: left;
-        width: 150px;
-
-        background-color: #FAFBFC;
-        border: 1px solid #FAFBFC;
-
-        -webkit-border-top-right-radius: 10px;
-        -webkit-border-bottom-right-radius: 10px;
-        -moz-border-radius-topright: 10px;
-        -moz-border-radius-bottomright: 10px;
-
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
-
-        padding-left: 5px;
-        height: 100%;
-    }
-
-    .toc ul {
-        margin: 0px;
-        padding: 0px;
-        list-style-type: none;
-    }
-
-    .toc ul ul {
-        font-size: 80%;
-        padding-left: 5px;
-    }
-
-    #content {
-        max-width: 960px;
-        margin-left: 160px;
-        padding: 10px;
-        border: 1px solid #FAFBFC;
-
-        background-color: #FAFBFC;
-
-        -webkit-border-radius: 10px;
-        -moz-border-radius: 10px;
-        border-radius: 10px;
-       
-        -webkit-box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.5);
-        -moz-box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.5);
-        box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.5);
-    }
-
-    a {
-        color: inherit;
-    }
-
-    pre {
-        border: 1px solid #ccc;
-        background-color: ghostWhite;
-        font: 15px/19px Inconsolata,"Lucida Console",Terminal,"Courier New",Courier;
-
-        -webkit-border-radius: 10px;
-        -moz-border-radius: 10px;
-        border-radius: 10px;
-        padding: 5px;
-    }
-
-    p code {
-        font-family: monospace;
-        border-bottom: 1px dashed #ccc;
-
-    }
-
-    .label { 
-        display: block;
-        margin-bottom: 0px;
-        padding: 0px;
-        font-family: sans;
-        font-weight: bold;
-        width: 200px;
-        padding: 0.5em;
-    }
-
-    .author {
-        text-align: center;
-    }
-
-    .email {
-        text-align: center;
-        font-size: 10pt;
-    }
-
-
-    h1 {
-        text-align: center;
-        padding-bottom: 5px;
-    }
-
-    h2 {
-        padding-bottom: 10px;
-    }
-
-    .green {
-        color: #7c9a5e;
-    }
-</style>
-<body>
-<div id="content">
-
-<header>
-    <h1><span class="green">gevent</span> For the Working Python Developer</h1>
-    <h3 class="author">
-        <a href="http://www.stephendiehl.com">Stephen Diehl</a>
-    </h3>
-</header>
-
-<blockquote>
-gevent is a concurrency library based around libev.  It provides a clean API for a variety of concurrency and network related tasks.
-</blockquote>
-
-<div class="toc">
-<ul>
-<li><a href="#core">Core</a><ul>
-<li><a href="#greenlets">Greenlets</a></li>
-<li><a href="#synchronous-asynchronous-execution">Synchronous &amp; Asynchronous Execution</a></li>
-<li><a href="#race-conditions">Race Conditions</a></li>
-<li><a href="#spawning-threads">Spawning Threads</a></li>
-<li><a href="#greenlet-state">Greenlet State</a></li>
-<li><a href="#program-shutdown">Program Shutdown</a></li>
-<li><a href="#timeouts">Timeouts</a></li>
-</ul>
-</li>
-<li><a href="#data-structures">Data Structures</a><ul>
-<li><a href="#events">Events</a></li>
-<li><a href="#queues">Queues</a></li>
-<li><a href="#groups-and-pools">Groups and Pools</a></li>
-<li><a href="#locks-and-semaphores">Locks and Semaphores</a></li>
-<li><a href="#actors">Actors</a></li>
-</ul>
-</li>
-<li><a href="#real-world-applications">Real World Applications</a><ul>
-<li><a href="#holding-side-effects">Holding Side Effects</a></li>
-<li><a href="#wsgi-servers">WSGI Servers</a></li>
-<li><a href="#long-polling">Long Polling</a></li>
-<li><a href="#chat-server">Chat Server</a></li>
-<li><a href="#license">License</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<h1 id="core">Core</h1>
-<p>The structure of this tutorial assumes an intermediate level
+The structure of this tutorial assumes an intermediate level
 knowledge of Python but not much else. No knowledge of
 concurrency is expected. The goal is to give you
 the tools you need to get going with gevent and use it to solve
-or speed up your applications today.</p>
-<p>The primary pattern provided by gevent is the <strong>Greenlet</strong>, a
+or speed up your applications today.
+
+The primary pattern provided by gevent is the <strong>Greenlet</strong>, a
 lightweight coroutine provided to Python as a C extension module.
 Greenlets all run inside of the OS process for the main
 program but are scheduled cooperatively by libev. This differs from
 <a href="http://docs.python.org/library/subprocess.html">subprocceses</a> 
-which are new processes are spawned by the OS.</p>
-<h2 id="greenlets">Greenlets</h2>
-<h2 id="synchronous-asynchronous-execution">Synchronous &amp; Asynchronous Execution</h2>
-<p>The core idea of concurrency is that a larger task can be broken
+which are new processes are spawned by the OS.
+
+## Greenlets
+
+## Synchronous & Asynchronous Execution
+
+The core idea of concurrency is that a larger task can be broken
 down into a collection of subtasks whose operation does not
 depend on the other tasks and thus can be run 
-<em>asynchronously</em> instead of one at a time 
-<em>synchronously</em>. A switch between the two
-executions is known as a <em>context swtich</em>.</p>
-<p>A context switch in gevent done through
-<em>yielding</em>. In this case example we have
+*asynchronously* instead of one at a time 
+*synchronously*. A switch between the two
+executions is known as a *context swtich*.
+
+A context switch in gevent done through
+*yielding*. In this case example we have
 two contexts which yield to each other through invoking 
-<code>gevent.sleep(0)</code>.</p>
+``gevent.sleep(0)``.
+
 <pre>
 <code class="python">import gevent
 
@@ -210,12 +51,13 @@ gevent.joinall([
 </code>
 </pre>
 
-<p>A somewhat synthetic example defines a <code>task</code> function
-which is <em>non-deterministic</em>
+A somewhat synthetic example defines a ``task`` function
+which is *non-deterministic*
 (i.e. its output is not guaranteed to give the same result for
 the same inputs). In this case the side effect of running the
 function is that the task pauses its execution for a random
-number of seconds.</p>
+number of seconds.
+
 <pre>
 <code class="python">import gevent
 import random
@@ -243,17 +85,19 @@ asynchronous()
 </code>
 </pre>
 
-<p>In the synchronous case all the tasks are run sequentially,
-which results in the main programming <em>blocking</em> (
+In the synchronous case all the tasks are run sequentially,
+which results in the main programming *blocking* (
 i.e. pausing the execution of the main program )
-while each task executes.</p>
-<p>The important parts of the program are the
-<code>gevent.spawn</code> which wraps up the given function
+while each task executes.
+
+The important parts of the program are the
+``gevent.spawn`` which wraps up the given function
 inside of a Greenlet thread. The list of initialized greenlets 
-are stored in the array <code>threads</code> which is passed to
-the <code>gevent.joinall</code> function which blocks the current
+are stored in the array ``threads`` which is passed to
+the ``gevent.joinall`` function which blocks the current
 program to run all the given greenlets. The execution will step
-forward only when all the greenlets terminate.</p>
+forward only when all the greenlets terminate.
+
 <p>The output is:</p>
 
 <pre>
@@ -283,17 +127,19 @@ Task 7 done
 </code>
 </pre>
 
-<p>The important fact to notice is that the order of execution in
+The important fact to notice is that the order of execution in
 the async case is essentially random and that the total execution
 time in the async case is much less than the sync case. In fact
 the maximum time for the synchronous case to complete is when
 each tasks pauses for 2 seconds resulting in a 20 seconds for the
 whole queue. In the async case the maximum runtime is roughly 2
 seconds since none of the tasks block the execution of the
-others.</p>
-<p>A more common use case, fetching data from a server
-asynchronously, the runtime of <code>fetch()</code> will differ between
-requests given the load on the remote server.</p>
+others.
+
+A more common use case, fetching data from a server
+asynchronously, the runtime of ``fetch()`` will differ between
+requests given the load on the remote server.
+
 <pre><code class="python">import gevent.monkey
 gevent.monkey.patch_socket()
 
@@ -328,22 +174,28 @@ asynchronous()
 </code>
 </pre>
 
-<h2 id="race-conditions">Race Conditions</h2>
-<p>The perennial problem involved with concurrency is known as a
-<em>race condition</em>. Simply put is when two concurrent threads
+
+## Race Conditions
+
+The perennial problem involved with concurrency is known as a
+*race condition*. Simply put is when two concurrent threads
 / processes depend on some shared resource but also attempt to
 modify this value. This results in resources whose values become
 time-dependent on the execution order. This is a problem, and in
 general one should very much try to avoid race conditions since
 they result program behavior which is globally
-non-deterministic.*</p>
-<p>One approach to avoiding race conditions is to simply not
-have any global <em>state</em> shared between threads. To
+non-deterministic.*
+
+One approach to avoiding race conditions is to simply not
+have any global *state* shared between threads. To
 communicate threads instead pass stateless messages between each 
-other.</p>
-<h2 id="spawning-threads">Spawning Threads</h2>
-<p>gevent provides a few wrappers around Greenlet initialization.
-Some of the most common patterns are:</p>
+other.
+
+## Spawning Threads
+
+gevent provides a few wrappers around Greenlet initialization.
+Some of the most common patterns are:
+
 <pre>
 <code class="python">import gevent
 from gevent import Greenlet
@@ -375,8 +227,9 @@ gevent.joinall(threads)
 </code>
 </pre>
 
-<p>In addition to using the base Greenlet class, you may also subclass
-Greenlet class and overload the <code>_run</code> method.</p>
+In addition to using the base Greenlet class, you may also subclass
+Greenlet class and overload the ``_run`` method.
+
 <pre>
 <code class="python">from gevent import Greenlet
 
@@ -397,21 +250,23 @@ g.join()
 </code>
 </pre>
 
-<h2 id="greenlet-state">Greenlet State</h2>
-<p>Like any other segement of code Greenlets can fail in various
+
+## Greenlet State
+
+Like any other segement of code Greenlets can fail in various
 ways. A greenlet may fail throw an exception, fail to halt or
-consume too many system resources.</p></p>
+consume too many system resources.</p>
+
 <p>The internal state of a greenlet is generally a time-dependent
 parameter. There are a number of flags on greenlets which let
 you monitor the state of the thread</p>
 
-<ul>
-<li><code>started</code> -- Boolean, indicates whether the Greenlet has been started. </li></li>
-<li><code>ready()</code> -- Boolean, indicates whether the Greenlet has halted</li></li>
-<li><code>successful()</code> -- Boolean, indicates whether the Greenlet has halted and not thrown an exception</li></li>
-<li><code>value</code> -- arbitrary, the value returned by the Greenlet</li></li>
-<li><code>exception</code> -- exception, uncaught exception instance thrown inside the greenlet</li></li>
-</ul>
+- ``started`` -- Boolean, indicates whether the Greenlet has been started. </li>
+- ``ready()`` -- Boolean, indicates whether the Greenlet has halted</li>
+- ``successful()`` -- Boolean, indicates whether the Greenlet has halted and not thrown an exception</li>
+- ``value`` -- arbitrary, the value returned by the Greenlet</li>
+- ``exception`` -- exception, uncaught exception instance thrown inside the greenlet</li>
+
 <pre>
 <code class="python">import gevent
 
@@ -455,13 +310,16 @@ loser.get()
 </code>
 </pre>
 
-<h2 id="program-shutdown">Program Shutdown</h2>
-<p>Greenlets that fail to yield when the main program receives a
+## Program Shutdown
+
+Greenlets that fail to yield when the main program receives a
 SIGQUIT may hold the program's execution longer than expected.
 This results in so called "zombie processes" which need to be
-killed from outside of the Python interpreter.</p>
-<p>A common pattern is to listen SIGQUIT events on the main program
-and to invoke <code>gevent.shutdown</code> before exit.</p>
+killed from outside of the Python interpreter.
+
+A common pattern is to listen SIGQUIT events on the main program
+and to invoke ``gevent.shutdown`` before exit.
+
 <pre>
 <code class="python">import gevent
 import signal
@@ -476,9 +334,11 @@ if __name__ == '__main__':
 </code>
 </pre>
 
-<h2 id="timeouts">Timeouts</h2>
-<p>Timeouts are a constraint on the runtime of a block of code or a
-Greenlet.</p>
+## Timeouts
+
+Timeouts are a constraint on the runtime of a block of code or a
+Greenlet.
+
 <pre>
 <code class="python">
 from gevent import Timeout
@@ -499,7 +359,8 @@ except Timeout:
 </code>
 </pre>
 
-<p>Or with a context manager in a <code>with</code> a statement.</p>
+Or with a context manager in a ``with`` a statement.
+
 <pre>
 <code class="python">import gevent
 from gevent import Timeout
@@ -514,8 +375,9 @@ with Timeout(time_to_wait, TooLong):
 </code>
 </pre>
 
-<p>In addition, gevent also provides timeout arguments for a
-variety of Greenlet and data stucture related calls. For example:</p>
+In addition, gevent also provides timeout arguments for a
+variety of Greenlet and data stucture related calls. For example:
+
 <pre>
 <code class="python">import gevent
 from gevent import Timeout
@@ -541,10 +403,13 @@ gevent.with_timeout(1, wait)
 </code>
 </pre>
 
-<h1 id="data-structures">Data Structures</h1>
-<h2 id="events">Events</h2>
-<p>Events are a form of asynchronous communication between
-Greenlets.</p>
+# Data Structures
+
+## Events
+
+Events are a form of asynchronous communication between
+Greenlets.
+
 <pre>
 <code class="python">import gevent
 from gevent.event import AsyncResult
@@ -574,11 +439,12 @@ gevent.joinall([
 </code>
 </pre>
 
-<p>A extension of the Event object is the AsyncResult which
+A extension of the Event object is the AsyncResult which
 allows you to send a value along with the wakeup call. This is
 sometimes called a future or a deferred, since it holds a 
 reference to a future value that can be set on an arbitrary time
-schedule.</p>
+schedule.
+
 <pre>
 <code class="python">import gevent
 from gevent.event import AsyncResult
@@ -606,13 +472,16 @@ gevent.joinall([
 </code>
 </pre>
 
-<h2 id="queues">Queues</h2>
-<p>Queues are ordered sets of data that have the usual <code>put</code> / <code>get</code>
+## Queues
+
+Queues are ordered sets of data that have the usual ``put`` / ``get``
 operations but are written in a way such that they can be safely
-manipulated across Greenlets.</p>
-<p>For example if one Greenlet grabs an item off of the queue, the
+manipulated across Greenlets.
+
+For example if one Greenlet grabs an item off of the queue, the
 same item will not grabbed by another Greenlet executing
-simultaneously.</p>
+simultaneously.
+
 <pre>
 <code class="python">import gevent
 from gevent.queue import Queue
@@ -641,21 +510,24 @@ gevent.joinall([
 </code>
 </pre>
 
-<p>Queues can also block on either <code>put</code> or <code>get</code> as the need arises. </p>
-<p>Each of the <code>put</code> and <code>get</code> operations has a non-blocking
-counterpart, <code>put_nowait</code> and 
-<code>get_nowait</code> which will not block, but instead raise
-either <code>gevent.queue.Empty</code> or
-<code>gevent.queue.Full</code> in the operation is not possible.</p>
-<p>In this example we have the boss running simultaneously to the
+Queues can also block on either ``put`` or ``get`` as the need arises. 
+
+Each of the ``put`` and ``get`` operations has a non-blocking
+counterpart, ``put_nowait`` and 
+``get_nowait`` which will not block, but instead raise
+either ``gevent.queue.Empty`` or
+``gevent.queue.Full`` in the operation is not possible.
+
+In this example we have the boss running simultaneously to the
 workers and have a restriction on the Queue that it can contain no
-more than three elements. This restriction means that the <code>put</code>
+more than three elements. This restriction means that the ``put``
 operation will block until there is space on the queue.
-Conversely the <code>get</code> operation will block if there are
+Conversely the ``get`` operation will block if there are
 no elements on the queue to fetch, it also takes a timeout
 argument to allow for the queue to exit with the exception
-<code>gevent.queue.Empty</code> if no work can found within the
-time frame of the Timeout.</p>
+``gevent.queue.Empty`` if no work can found within the
+time frame of the Timeout.
+
 <pre>
 <code class="python">import gevent
 from gevent.queue import Queue, Empty
@@ -694,17 +566,22 @@ gevent.joinall([
 </code>
 </pre>
 
-<h2 id="groups-and-pools">Groups and Pools</h2>
-<h2 id="locks-and-semaphores">Locks and Semaphores</h2>
-<h2 id="actors">Actors</h2>
-<p>The actor model is a higher level concurrency model popularized
+## Groups and Pools
+
+## Locks and Semaphores
+
+## Actors
+
+The actor model is a higher level concurrency model popularized
 by the language Erlang. In short the main idea is that you have a
 collection of independent Actors which have an inbox from which
 they receive messages from other Actors. The main loop inside the
 Actor iterates through its messages and takes action according to
-its desired behavior. </p>
-<p>Gevent does not have a primitive Actor type, but we can define
-one very simply using a Queue inside of a subclassed Greenlet.</p>
+its desired behavior. 
+
+Gevent does not have a primitive Actor type, but we can define
+one very simply using a Queue inside of a subclassed Greenlet.
+
 <pre>
 <code class="python">import gevent
 
@@ -730,7 +607,8 @@ class Actor(gevent.Greenlet):
 </code>
 </pre>
 
-<p>In a use case:</p>
+In a use case:
+
 <pre>
 <code class="python">import gevent
 from gevent.queue import Queue
@@ -759,10 +637,13 @@ gevent.joinall([ping, pong])
 </code>
 </pre>
 
-<h1 id="real-world-applications">Real World Applications</h1>
-<h2 id="holding-side-effects">Holding Side Effects</h2>
-<p>In this example we hold the side effects of executing an
-arbitrary string, </p>
+# Real World Applications
+
+## Holding Side Effects
+
+In this example we hold the side effects of executing an
+arbitrary string, 
+
 <pre>
 <code class="python">from gevent import Greenlet
 
@@ -786,9 +667,11 @@ while True:
     else:
         print g.exception
 </code>
-</pre>
+</pre> 
 
-<h2 id="wsgi-servers">WSGI Servers</h2>
+
+## WSGI Servers
+
 <pre>
 <code class="python">from gevent.pywsgi import WSGIServer
 
@@ -806,20 +689,25 @@ def application(environ, start_response):
 WSGIServer(('', 8000), application).serve_forever()
 
 </code>
-</pre>
+</pre> 
 
-<p>Performance on Gevent servers is phenomenal.</p>
+Performance on Gevent servers is phenomenal.
+
 <pre>
 <code class="shell">$ ab -n 10000 -c 100 http://127.0.0.1:8000/
 </code>
-</pre>
+</pre> 
 
-<h2 id="long-polling">Long Polling</h2>
-<h2 id="chat-server">Chat Server</h2>
-<p>The final motivating example, a realtime chat room. This example
+## Long Polling
+
+## Chat Server
+
+The final motivating example, a realtime chat room. This example
 requires <a href="http://flask.pocoo.org/">Flask</a> ( but not neccesarily so, you could use Django,
 Pyramid, etc ). The corresponding Javascript and HTML files can
-be found <a href="https://github.com/sdiehl/minichat">here</a>.</p>
+be found <a href="https://github.com/sdiehl/minichat">here</a>.
+
+
 <pre>
 <code class="python"># Micro gevent chatroom.
 # ----------------------
@@ -915,11 +803,9 @@ if __name__ == "__main__":
 </code>
 </pre>
 
-<h2 id="license">License</h2>
+## License
+
 <p>
 This is a collaborative document published under MIT license. Forking 
 on <a href="https://github.com/sdiehl/gevent-tutorial">GitHub</a> is encouraged
 </p>
-</div>
-</body>
-</html>

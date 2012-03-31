@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import codecs
+import markdown
+from jinja2 import Template
+
+from jinja2 import Environment, FileSystemLoader
+
+OUTPUT = 'index.html'
+
+loader = FileSystemLoader(os.getcwd())
+env = Environment(loader=loader)
+
+template = env.get_template('body.tmpl')
+
+input_file = codecs.open("tutorial.md", mode="r", encoding="utf-8")
+text = input_file.read()
+body = markdown.markdown(text, extensions=['toc'])
+
+with open(OUTPUT, 'w+') as f:
+    f.write(template.render(body=body))
+print 'Wrote', OUTPUT
