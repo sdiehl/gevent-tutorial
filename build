@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
+import re
 import os
 import sys
 import codecs
 import markdown
+from cStringIO import StringIO
+from cogapp import Cog
 from jinja2 import Template
 
 from jinja2 import Environment, FileSystemLoader
@@ -17,7 +20,27 @@ template = env.get_template('body.tmpl')
 
 input_file = codecs.open("tutorial.md", mode="r", encoding="utf-8")
 text = input_file.read()
-body = markdown.markdown(text, extensions=['toc'])
+
+old_stdout = sys.stdout
+sys.stdout = rstdout = StringIO()
+
+cog = Cog()
+
+cog.processOneFile('tutorial.md')
+sys.stdout = old_stdout
+
+cogged = rstdout.getvalue()
+
+start_code = """<pre><code class="python">"""
+end_code = """</pre></code>"""
+
+r1 = re.sub('\[\[\[end\]\]\]', end_code, cogged)
+r2 = re.sub(r'\[\[\[cog',start_code, r1)
+r3 = re.sub(r'\]\]\]',end_code + '\n' + start_code, r2)
+
+rendered_code = r3
+
+body = markdown.markdown(rendered_code, extensions=['toc'])
 
 with open(OUTPUT, 'w+') as f:
     f.write(template.render(body=body))

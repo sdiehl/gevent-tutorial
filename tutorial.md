@@ -31,25 +31,25 @@ A context switch in gevent done through
 two contexts which yield to each other through invoking 
 ``gevent.sleep(0)``.
 
-<pre>
-<code class="python">import gevent
+[[[cog
+import gevent
 
 def foo():
-    print 'Running in foo'
+    print('Running in foo')
     gevent.sleep(0)
-    print 'Emplict context switch to foo again'
+    print('Emplict context switch to foo again')
 
 def bar():
-    print 'Emplict context to bar'
+    print('Emplict context to bar')
     gevent.sleep(0)
-    print 'Implicit swtich switch back to bar'
+    print('Implicit swtich switch back to bar')
 
 gevent.joinall([
     gevent.spawn(foo),
     gevent.spawn(bar),
 ])
-</code>
-</pre>
+]]]
+[[[end]]]
 
 A somewhat synthetic example defines a ``task`` function
 which is *non-deterministic*
@@ -58,32 +58,32 @@ the same inputs). In this case the side effect of running the
 function is that the task pauses its execution for a random
 number of seconds.
 
-<pre>
-<code class="python">import gevent
+[[[cog
+import gevent
 import random
 
 def task(pid):
     """
     Some non-deterministic task
     """
-    gevent.sleep(random.randint(0,2))
-    print 'Task', pid, 'done'
+    gevent.sleep(random.randint(0,2)*0.001)
+    print('Task', pid, 'done')
 
 def synchronous():
     for i in range(1,10):
         task(i)
 
 def asynchronous():
-    threads = [gevent.spawn(task, i) for in xrange(10]
+    threads = [gevent.spawn(task, i) for i in xrange(10)]
     gevent.joinall(threads)
 
-print 'Synchronous:'
+print('Synchronous:')
 synchronous()
 
-print 'Asynchronous:'
+print('Asynchronous:')
 asynchronous()
-</code>
-</pre>
+]]]
+[[[end]]]
 
 In the synchronous case all the tasks are run sequentially,
 which results in the main programming *blocking* (
@@ -97,35 +97,6 @@ are stored in the array ``threads`` which is passed to
 the ``gevent.joinall`` function which blocks the current
 program to run all the given greenlets. The execution will step
 forward only when all the greenlets terminate.
-
-<p>The output is:</p>
-
-<pre>
-<code>
-Synchronous:
-Task 1 done
-Task 2 done
-Task 3 done
-Task 4 done
-Task 5 done
-Task 6 done
-Task 7 done
-Task 8 done
-Task 9 done
-Task 10 done
-Asynchronous:
-Task 2 done
-Task 3 done
-Task 5 done
-Task 10 done
-Task 8 done
-Task 6 done
-Task 9 done
-Task 1 done
-Task 4 done
-Task 7 done
-</code>
-</pre>
 
 The important fact to notice is that the order of execution in
 the async case is essentially random and that the total execution
@@ -196,8 +167,8 @@ other.
 gevent provides a few wrappers around Greenlet initialization.
 Some of the most common patterns are:
 
-<pre>
-<code class="python">import gevent
+[[[cog
+import gevent
 from gevent import Greenlet
 
 def foo(message, n):
@@ -206,12 +177,11 @@ def foo(message, n):
     in its initialization.
     """
     gevent.sleep(n)
-    print message
+    print(message)
 
 # Initialize a new Greenlet instance running the named function
 # foo
 thread1 = Greenlet.spawn(foo, "Hello", 1)
-thread1.start()
 
 # Wrapper for creating and runing a new Greenlet from the named 
 # function foo, with the passd arguments
@@ -224,14 +194,14 @@ threads = [thread1, thread2, thread3]
 
 # Block until all threads complete.
 gevent.joinall(threads)
-</code>
-</pre>
+]]]
+[[[end]]]
 
 In addition to using the base Greenlet class, you may also subclass
 Greenlet class and overload the ``_run`` method.
 
-<pre>
-<code class="python">from gevent import Greenlet
+[[[cog
+from gevent import Greenlet
 
 class MyGreenlet(Greenlet):
 
@@ -241,14 +211,14 @@ class MyGreenlet(Greenlet):
         self.n = n
 
     def _run(self):
-        print self.message
+        print(self.message)
         gevent.sleep(self.n)
 
 g = MyGreenlet("Hi there!", 3)
 g.start()
 g.join()
-</code>
-</pre>
+]]]
+[[[end]]]
 
 
 ## Greenlet State
@@ -267,8 +237,8 @@ you monitor the state of the thread</p>
 - ``value`` -- arbitrary, the value returned by the Greenlet</li>
 - ``exception`` -- exception, uncaught exception instance thrown inside the greenlet</li>
 
-<pre>
-<code class="python">import gevent
+[[[cog
+import gevent
 
 def win():
     return 'You win!'
@@ -279,36 +249,36 @@ def fail():
 winner = gevent.spawn(win)
 loser = gevent.spawn(fail)
 
-print winner.started # True
-print loser.started  # True
+print(winner.started) # True
+print(loser.started)  # True
 
 # Exceptions raised in the Greenlet, stay inside the Greenlet.
 try:
     gevent.joinall([winner, loser])
 except Exception as e:
-    print 'This will never be reached'
+    print('This will never be reached')
 
-print winner.value # 'You win!'
-print loser.value  # None
+print(winner.value) # 'You win!'
+print(loser.value)  # None
 
-print winner.ready() # True
-print loser.ready()  # True
+print(winner.ready()) # True
+print(loser.ready())  # True
 
-print winner.successful() # True
-print loser.successful()  # False
+print(winner.successful()) # True
+print(loser.successful())  # False
 
 # The exception raised in fail, will not propogate outside the
 # greenlet. A stack trace will be printed to stdout but it
 # will not unwind the stack of the parent.
 
-print loser.exception
+print(loser.exception)
 
 # It is possible though to raise the exception again outside
-raise loser.exception
+# raise loser.exception
 # or with
-loser.get()
-</code>
-</pre>
+# loser.get()
+]]]
+[[[end]]]
 
 ## Program Shutdown
 
@@ -378,30 +348,40 @@ with Timeout(time_to_wait, TooLong):
 In addition, gevent also provides timeout arguments for a
 variety of Greenlet and data stucture related calls. For example:
 
-<pre>
-<code class="python">import gevent
+[[[cog
+import gevent
 from gevent import Timeout
 
 def wait():
     gevent.sleep(2)
 
 timer = Timeout(1).start()
-
 thread1 = gevent.spawn(wait)
-thread1.join(timeout=timer)
+
+try:
+    thread1.join(timeout=timer)
+except Timeout:
+    print('Thread 1 timed out')
 
 # --
 
 timer = Timeout.start_new(1)
-
 thread2 = gevent.spawn(wait)
-thread2.get(timeout=timer)
+
+try:
+    thread2.get(timeout=timer)
+except Timeout:
+    print('Thread 2 timed out')
 
 # --
 
-gevent.with_timeout(1, wait)
-</code>
-</pre>
+try:
+    gevent.with_timeout(1, wait)
+except Timeout:
+    print('Thread 3 timed out')
+
+]]]
+[[[end]]]
 
 # Data Structures
 
@@ -482,8 +462,8 @@ For example if one Greenlet grabs an item off of the queue, the
 same item will not grabbed by another Greenlet executing
 simultaneously.
 
-<pre>
-<code class="python">import gevent
+[[[cog
+import gevent
 from gevent.queue import Queue
 
 tasks = Queue()
@@ -491,10 +471,10 @@ tasks = Queue()
 def worker(n):
     while not tasks.empty():
         task = tasks.get()
-        print 'Worker %s got task %s' % (n, task)
-        gevent.sleep(0.5)
+        print('Worker %s got task %s' % (n, task))
+        gevent.sleep(0)
 
-    print 'Quitting time!'
+    print('Quitting time!')
 
 def boss():
     for i in xrange(1,25):
@@ -507,8 +487,8 @@ gevent.joinall([
     gevent.spawn(worker, 'john'),
     gevent.spawn(worker, 'nancy'),
 ])
-</code>
-</pre>
+]]]
+[[[end]]]
 
 Queues can also block on either ``put`` or ``get`` as the need arises. 
 
@@ -805,7 +785,5 @@ if __name__ == "__main__":
 
 ## License
 
-<p>
 This is a collaborative document published under MIT license. Forking 
 on <a href="https://github.com/sdiehl/gevent-tutorial">GitHub</a> is encouraged
-</p>
