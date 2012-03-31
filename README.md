@@ -3,9 +3,9 @@ Online Version: http://sdiehl.github.com/gevent-tutorial/
 
 Want to add an example. Its uber simple.
 
-1) Fork the repo.
-2) ``pip install -r requirements.txt``
-3) Edit ``tutorial.md``.
+1. Fork the repo.
+2. ``pip install -r requirements.txt``
+3. Edit ``tutorial.md``.
 
 Add your text as Markdown.
 
@@ -43,9 +43,9 @@ Will output this as html:
     </code>
     </pre>
 
-4) Run ``./build.sh``
-5) Issue pull request.
-6) Get good gevent karma.
+4. Run ``./build.sh``
+5. Issue pull request.
+6. Get good gevent karma.
 
 Released under MIT License.
 
