@@ -141,7 +141,7 @@ gevent is a concurrency library based around libev.  It provides a clean API for
 <li><a href="#core">Core</a><ul>
 <li><a href="#greenlets">Greenlets</a></li>
 <li><a href="#synchronous-asynchronous-execution">Synchronous &amp; Asynchronous Execution</a></li>
-<li><a href="#race-conditions">Race Conditions</a></li>
+<li><a href="#determinism">Determinism</a></li>
 <li><a href="#spawning-threads">Spawning Threads</a></li>
 <li><a href="#greenlet-state">Greenlet State</a></li>
 <li><a href="#program-shutdown">Program Shutdown</a></li>
@@ -153,11 +153,15 @@ gevent is a concurrency library based around libev.  It provides a clean API for
 <li><a href="#queues">Queues</a></li>
 <li><a href="#groups-and-pools">Groups and Pools</a></li>
 <li><a href="#locks-and-semaphores">Locks and Semaphores</a></li>
+<li><a href="#thread-locals">Thread Locals</a><ul>
+<li><a href="#werkzeug">Werkzeug</a></li>
+</ul>
+</li>
 <li><a href="#actors">Actors</a></li>
 </ul>
 </li>
 <li><a href="#real-world-applications">Real World Applications</a><ul>
-<li><a href="#holding-side-effects">Holding Side Effects</a></li>
+<li><a href="#green-zeromq">Green ZeroMQ</a></li>
 <li><a href="#wsgi-servers">WSGI Servers</a></li>
 <li><a href="#long-polling">Long Polling</a></li>
 <li><a href="#chat-server">Chat Server</a></li>
@@ -172,13 +176,14 @@ knowledge of Python but not much else. No knowledge of
 concurrency is expected. The goal is to give you
 the tools you need to get going with gevent and use it to solve
 or speed up your applications today.</p>
-<p>The primary pattern provided by gevent is the <strong>Greenlet</strong>, a
+<h2 id="greenlets">Greenlets</h2>
+<p>The primary pattern used in gevent is the <strong>Greenlet</strong>, a
 lightweight coroutine provided to Python as a C extension module.
 Greenlets all run inside of the OS process for the main
-program but are scheduled cooperatively by libev. This differs from
-<a href="http://docs.python.org/library/subprocess.html">subprocceses</a> 
-which are new processes are spawned by the OS.</p>
-<h2 id="greenlets">Greenlets</h2>
+program but are scheduled cooperatively. This differs from any of
+the real parallelism constructs provided by <code>multiprocessing</code> or
+<code>multithreading</code> libraries which do spin processes and posix threads
+which are truly parallel.</p>
 <h2 id="synchronous-asynchronous-execution">Synchronous &amp; Asynchronous Execution</h2>
 <p>The core idea of concurrency is that a larger task can be broken
 down into a collection of subtasks whose operation does not
@@ -215,6 +220,51 @@ Running in foo
 Emplict context to bar
 Emplict context switch to foo again
 Implicit swtich switch back to bar
+</pre></code></p>
+<p>The real power of gevent comes when we use it for network and IO
+bound functions which can be cooperatively scheduled. Gevent has
+taken care of all the details to ensure that your network
+libraries will implictly yield their greenlet contexts whenever
+possible. I cannot stress enough what a powerful idiom this is.
+But maybe an example will illustrate.</p>
+<pre><code class="python">
+import time
+import gevent
+from gevent import select
+
+start = time.time()
+tic = lambda: 'at %1.1f seconds' % (time.time() - start)
+
+def gr1():
+    # Busy waits for a second, but we don't want to stick around...
+    print('Started Polling: ', tic())
+    select.select([], [], [], 2)
+    print('Ended Polling: ', tic())
+
+def gr2():
+    # Busy waits for a second, but we don't want to stick around...
+    print('Started Polling: ', tic())
+    select.select([], [], [], 2)
+    print('Ended Polling: ', tic())
+
+def gr3():
+    print("Hey lets do some stuff while the greenlets poll, at", tic())
+    gevent.sleep(1)
+
+gevent.joinall([
+    gevent.spawn(gr1),
+    gevent.spawn(gr2),
+    gevent.spawn(gr3),
+])
+</pre>
+
+<p></code>
+<pre><code class="python">
+Started Polling:  at 0.0 seconds
+Started Polling:  at 0.0 seconds
+Hey lets do some stuff while the greenlets poll, at at 0.0 seconds
+Ended Polling:  at 2.0 seconds
+Ended Polling:  at 2.0 seconds
 </pre></code></p>
 <p>A somewhat synthetic example defines a <code>task</code> function
 which is <em>non-deterministic</em>
@@ -264,13 +314,13 @@ Asynchronous:
 Task 1 done
 Task 2 done
 Task 6 done
-Task 9 done
-Task 5 done
-Task 0 done
-Task 7 done
-Task 8 done
-Task 4 done
 Task 3 done
+Task 4 done
+Task 7 done
+Task 0 done
+Task 9 done
+Task 8 done
+Task 5 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -328,7 +378,52 @@ asynchronous()
 </code>
 </pre>
 
-<h2 id="race-conditions">Race Conditions</h2>
+<h2 id="determinism">Determinism</h2>
+<p>As mentioned previously, greenlets are deterministic. Given the
+same inputs and they always produce the same output. For example
+lets spread a task across a multiprocessing pool compared to a
+gevent pool.</p>
+<pre><code class="python">
+def echo(i):
+    import time
+    time.sleep(0.001)
+    return i
+
+# Non Deterministic Process Pool
+
+from multiprocessing.pool import Pool
+
+p = Pool(10)
+#run1 = [a for a in p.imap_unordered(echo, xrange(10))]
+#run2 = [a for a in p.imap_unordered(echo, xrange(10))]
+#run3 = [a for a in p.imap_unordered(echo, xrange(10))]
+#run4 = [a for a in p.imap_unordered(echo, xrange(10))]
+
+#print( run1 == run2 == run3 == run4 )
+
+# Deterministic Gevent Pool
+
+from gevent.pool import Pool
+
+p = Pool(10)
+run1 = [a for a in p.imap_unordered(echo, xrange(10))]
+run2 = [a for a in p.imap_unordered(echo, xrange(10))]
+run3 = [a for a in p.imap_unordered(echo, xrange(10))]
+run4 = [a for a in p.imap_unordered(echo, xrange(10))]
+
+print( run1 == run2 == run3 == run4 )
+</pre>
+
+<p></code>
+<pre><code class="python">
+True
+</pre></code></p>
+<p>Even though gevent is normally deterministic, sources of
+non-determinism can creep into your program when you beging to
+interact with outside services such as sockets and files. Thus
+even though green threads are a form of "deterministic
+concurrency", they still can experience some of the smae problems
+that posix threads and processes experience.</p>
 <p>The perennial problem involved with concurrency is known as a
 <em>race condition</em>. Simply put is when two concurrent threads
 / processes depend on some shared resource but also attempt to
@@ -337,10 +432,9 @@ time-dependent on the execution order. This is a problem, and in
 general one should very much try to avoid race conditions since
 they result program behavior which is globally
 non-deterministic.*</p>
-<p>One approach to avoiding race conditions is to simply not
-have any global <em>state</em> shared between threads. To
-communicate threads instead pass stateless messages between each 
-other.</p>
+<p>The best approach to this is to simply avoid all global state all
+times. Global state and import-time side effects will always come
+back to bite you!</p>
 <h2 id="spawning-threads">Spawning Threads</h2>
 <p>gevent provides a few wrappers around Greenlet initialization.
 Some of the most common patterns are:</p>
@@ -541,13 +635,12 @@ def wait():
     gevent.sleep(2)
 
 timer = Timeout(1).start()
-
 thread1 = gevent.spawn(wait)
 
 try:
     thread1.join(timeout=timer)
 except Timeout:
-    print('Timed out')
+    print('Thread 1 timed out')
 
 # --
 
@@ -557,22 +650,22 @@ thread2 = gevent.spawn(wait)
 try:
     thread2.get(timeout=timer)
 except Timeout:
-    print('Timed out')
+    print('Thread 2 timed out')
 
 # --
 
 try:
     gevent.with_timeout(1, wait)
 except Timeout:
-    print('Timed out')
+    print('Thread 3 timed out')
 
 </pre>
 
 <p></code>
 <pre><code class="python">
-Timed out
-Timed out
-Timed out
+Thread 1 timed out
+Thread 2 timed out
+Thread 3 timed out
 </pre></code></p>
 <h1 id="data-structures">Data Structures</h1>
 <h2 id="events">Events</h2>
@@ -718,8 +811,8 @@ no elements on the queue to fetch, it also takes a timeout
 argument to allow for the queue to exit with the exception
 <code>gevent.queue.Empty</code> if no work can found within the
 time frame of the Timeout.</p>
-<pre>
-<code class="python">import gevent
+<pre><code class="python">
+import gevent
 from gevent.queue import Queue, Empty
 
 tasks = Queue(maxsize=3)
@@ -728,10 +821,10 @@ def worker(n):
     try:
         while True:
             task = tasks.get(timeout=1) # decrements queue size by 1
-            print 'Worker %s got task %s' % (n, task)
-            gevent.sleep(0.5)
+            print('Worker %s got task %s' % (n, task))
+            gevent.sleep(0)
     except Empty:
-        print 'Quitting time!'
+        print('Quitting time!')
 
 def boss():
     """
@@ -741,11 +834,11 @@ def boss():
 
     for i in xrange(1,10):
         tasks.put(i)
-    print 'Assigned all work in iteration 1'
+    print('Assigned all work in iteration 1')
 
     for i in xrange(10,20):
         tasks.put(i)
-    print 'Assigned all work in iteration 2'
+    print('Assigned all work in iteration 2')
 
 gevent.joinall([
     gevent.spawn(boss),
@@ -753,11 +846,39 @@ gevent.joinall([
     gevent.spawn(worker, 'john'),
     gevent.spawn(worker, 'bob'),
 ])
-</code>
 </pre>
 
+<p></code>
+<pre><code class="python">
+Worker steve got task 1
+Worker john got task 2
+Worker bob got task 3
+Worker steve got task 4
+Worker bob got task 5
+Worker john got task 6
+Assigned all work in iteration 1
+Worker steve got task 7
+Worker john got task 8
+Worker bob got task 9
+Worker steve got task 10
+Worker bob got task 11
+Worker john got task 12
+Worker steve got task 13
+Worker john got task 14
+Worker bob got task 15
+Worker steve got task 16
+Worker bob got task 17
+Worker john got task 18
+Assigned all work in iteration 2
+Worker steve got task 19
+Quitting time!
+Quitting time!
+Quitting time!
+</pre></code></p>
 <h2 id="groups-and-pools">Groups and Pools</h2>
 <h2 id="locks-and-semaphores">Locks and Semaphores</h2>
+<h2 id="thread-locals">Thread Locals</h2>
+<h3 id="werkzeug">Werkzeug</h3>
 <h2 id="actors">Actors</h2>
 <p>The actor model is a higher level concurrency model popularized
 by the language Erlang. In short the main idea is that you have a
@@ -822,34 +943,7 @@ gevent.joinall([ping, pong])
 </pre>
 
 <h1 id="real-world-applications">Real World Applications</h1>
-<h2 id="holding-side-effects">Holding Side Effects</h2>
-<p>In this example we hold the side effects of executing an
-arbitrary string, </p>
-<pre>
-<code class="python">from gevent import Greenlet
-
-env = {}
-
-def run_code(code, env={}):
-    local = locals()
-    local.update(env)
-    exec(code, globals(), local)
-    return local
-
-while True:
-    code = raw_input('>')
-
-    g = Greenlet.spawn(run_code, code, env)
-    g.join() # block until code executes
-
-    # If succesfull then pass the locals to the next command
-    if g.value:
-        env = g.get()
-    else:
-        print g.exception
-</code>
-</pre>
-
+<h2 id="green-zeromq">Green ZeroMQ</h2>
 <h2 id="wsgi-servers">WSGI Servers</h2>
 <pre>
 <code class="python">from gevent.pywsgi import WSGIServer

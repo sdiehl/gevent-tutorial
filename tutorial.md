@@ -8,14 +8,15 @@ concurrency is expected. The goal is to give you
 the tools you need to get going with gevent and use it to solve
 or speed up your applications today.
 
-The primary pattern provided by gevent is the <strong>Greenlet</strong>, a
+## Greenlets
+
+The primary pattern used in gevent is the <strong>Greenlet</strong>, a
 lightweight coroutine provided to Python as a C extension module.
 Greenlets all run inside of the OS process for the main
-program but are scheduled cooperatively by libev. This differs from
-<a href="http://docs.python.org/library/subprocess.html">subprocceses</a> 
-which are new processes are spawned by the OS.
-
-## Greenlets
+program but are scheduled cooperatively. This differs from any of
+the real parallelism constructs provided by ``multiprocessing`` or
+``multithreading`` libraries which do spin processes and posix threads
+which are truly parallel.
 
 ## Synchronous & Asynchronous Execution
 
@@ -47,6 +48,45 @@ def bar():
 gevent.joinall([
     gevent.spawn(foo),
     gevent.spawn(bar),
+])
+]]]
+[[[end]]]
+
+The real power of gevent comes when we use it for network and IO
+bound functions which can be cooperatively scheduled. Gevent has
+taken care of all the details to ensure that your network
+libraries will implictly yield their greenlet contexts whenever
+possible. I cannot stress enough what a powerful idiom this is.
+But maybe an example will illustrate.
+
+[[[cog
+import time
+import gevent
+from gevent import select
+
+start = time.time()
+tic = lambda: 'at %1.1f seconds' % (time.time() - start)
+
+def gr1():
+    # Busy waits for a second, but we don't want to stick around...
+    print('Started Polling: ', tic())
+    select.select([], [], [], 2)
+    print('Ended Polling: ', tic())
+
+def gr2():
+    # Busy waits for a second, but we don't want to stick around...
+    print('Started Polling: ', tic())
+    select.select([], [], [], 2)
+    print('Ended Polling: ', tic())
+
+def gr3():
+    print("Hey lets do some stuff while the greenlets poll, at", tic())
+    gevent.sleep(1)
+
+gevent.joinall([
+    gevent.spawn(gr1),
+    gevent.spawn(gr2),
+    gevent.spawn(gr3),
 ])
 ]]]
 [[[end]]]
@@ -145,8 +185,51 @@ asynchronous()
 </code>
 </pre>
 
+## Determinism
 
-## Race Conditions
+As mentioned previously, greenlets are deterministic. Given the
+same inputs and they always produce the same output. For example
+lets spread a task across a multiprocessing pool compared to a
+gevent pool.
+
+[[[cog
+def echo(i):
+    import time
+    time.sleep(0.001)
+    return i
+
+# Non Deterministic Process Pool
+
+from multiprocessing.pool import Pool
+
+p = Pool(10)
+#run1 = [a for a in p.imap_unordered(echo, xrange(10))]
+#run2 = [a for a in p.imap_unordered(echo, xrange(10))]
+#run3 = [a for a in p.imap_unordered(echo, xrange(10))]
+#run4 = [a for a in p.imap_unordered(echo, xrange(10))]
+
+#print( run1 == run2 == run3 == run4 )
+
+# Deterministic Gevent Pool
+
+from gevent.pool import Pool
+
+p = Pool(10)
+run1 = [a for a in p.imap_unordered(echo, xrange(10))]
+run2 = [a for a in p.imap_unordered(echo, xrange(10))]
+run3 = [a for a in p.imap_unordered(echo, xrange(10))]
+run4 = [a for a in p.imap_unordered(echo, xrange(10))]
+
+print( run1 == run2 == run3 == run4 )
+]]]
+[[[end]]]
+
+Even though gevent is normally deterministic, sources of
+non-determinism can creep into your program when you beging to
+interact with outside services such as sockets and files. Thus
+even though green threads are a form of "deterministic
+concurrency", they still can experience some of the smae problems
+that posix threads and processes experience.
 
 The perennial problem involved with concurrency is known as a
 *race condition*. Simply put is when two concurrent threads
@@ -157,10 +240,9 @@ general one should very much try to avoid race conditions since
 they result program behavior which is globally
 non-deterministic.*
 
-One approach to avoiding race conditions is to simply not
-have any global *state* shared between threads. To
-communicate threads instead pass stateless messages between each 
-other.
+The best approach to this is to simply avoid all global state all
+times. Global state and import-time side effects will always come
+back to bite you!
 
 ## Spawning Threads
 
@@ -508,8 +590,8 @@ argument to allow for the queue to exit with the exception
 ``gevent.queue.Empty`` if no work can found within the
 time frame of the Timeout.
 
-<pre>
-<code class="python">import gevent
+[[[cog
+import gevent
 from gevent.queue import Queue, Empty
 
 tasks = Queue(maxsize=3)
@@ -518,10 +600,10 @@ def worker(n):
     try:
         while True:
             task = tasks.get(timeout=1) # decrements queue size by 1
-            print 'Worker %s got task %s' % (n, task)
-            gevent.sleep(0.5)
+            print('Worker %s got task %s' % (n, task))
+            gevent.sleep(0)
     except Empty:
-        print 'Quitting time!'
+        print('Quitting time!')
 
 def boss():
     """
@@ -531,11 +613,11 @@ def boss():
 
     for i in xrange(1,10):
         tasks.put(i)
-    print 'Assigned all work in iteration 1'
+    print('Assigned all work in iteration 1')
 
     for i in xrange(10,20):
         tasks.put(i)
-    print 'Assigned all work in iteration 2'
+    print('Assigned all work in iteration 2')
 
 gevent.joinall([
     gevent.spawn(boss),
@@ -543,12 +625,16 @@ gevent.joinall([
     gevent.spawn(worker, 'john'),
     gevent.spawn(worker, 'bob'),
 ])
-</code>
-</pre>
+]]]
+[[[end]]]
 
 ## Groups and Pools
 
 ## Locks and Semaphores
+
+## Thread Locals
+
+### Werkzeug
 
 ## Actors
 
@@ -619,36 +705,7 @@ gevent.joinall([ping, pong])
 
 # Real World Applications
 
-## Holding Side Effects
-
-In this example we hold the side effects of executing an
-arbitrary string, 
-
-<pre>
-<code class="python">from gevent import Greenlet
-
-env = {}
-
-def run_code(code, env={}):
-    local = locals()
-    local.update(env)
-    exec(code, globals(), local)
-    return local
-
-while True:
-    code = raw_input('>')
-
-    g = Greenlet.spawn(run_code, code, env)
-    g.join() # block until code executes
-
-    # If succesfull then pass the locals to the next command
-    if g.value:
-        env = g.get()
-    else:
-        print g.exception
-</code>
-</pre> 
-
+## Green ZeroMQ
 
 ## WSGI Servers
 
