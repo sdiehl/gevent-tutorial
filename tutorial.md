@@ -657,7 +657,7 @@ class Actor(gevent.Greenlet):
         self.inbox = queue.Queue()
         Greenlet.__init__(self)
 
-    def recieve(self, message):
+    def receive(self, message):
         """
         Define in your subclass.
         """
@@ -668,7 +668,7 @@ class Actor(gevent.Greenlet):
 
         while self.running:
             message = self.inbox.get()
-            self.recieve(message)
+            self.receive(message)
 
 </code>
 </pre>
@@ -681,13 +681,13 @@ from gevent.queue import Queue
 from gevent import Greenlet
 
 class Pinger(Actor):
-    def recieve(self, message):
+    def receive(self, message):
         print message
         pong.inbox.put('ping')
         gevent.sleep(0)
 
 class Ponger(Actor):
-    def recieve(self, message):
+    def receive(self, message):
         print message
         ping.inbox.put('pong')
         gevent.sleep(0)
