@@ -43,7 +43,7 @@ Will output this as html:
     </code>
     </pre>
 
-4. Run ``./build.sh``
+4. Run ``./build``
 5. Issue pull request.
 6. Get good gevent karma.
 
