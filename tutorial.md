@@ -705,7 +705,57 @@ gevent.joinall([ping, pong])
 
 # Real World Applications
 
-## Green ZeroMQ
+## Gevent ZeroMQ
+
+[ZeroMQ](http://www.zeromq.org/) is described by its authors as
+"a socket library that acts as a concurrency framework". It is a
+very powerful messaging layer for building concurrent and
+distributed applications. 
+
+ZeroMQ provides a variety of socket primitives, the simplest of
+which being a Request-Response socket pair. A socket has two
+methods of interest ``send`` and ``recv``, both of which are
+normally blocking operations. But this is remedied by a briliant
+library by [Travis Cline](https://github.com/traviscline) which
+uses gevent.socket to poll ZeroMQ sockets in a non-blocking
+manner.  You can install gevent-zeromq from PyPi via:  ``pip install
+gevent-zeromq``
+
+[[[cog
+# Note: Remember to ``pip install pyzmq gevent_zeromq``
+from gevent_zeromq import zmq
+
+# Global Context
+context = zmq.Context()
+
+def server():
+    server_socket = context.socket(zmq.REQ)
+    server_socket.bind("tcp://*:5000")
+
+    for request in range(1,10):
+        server_socket.send("Hello")
+        print('Switched to Server for ', request)
+        # Implicit context switch occurs here
+        server_socket.recv()
+
+def client():
+    client_socket = context.socket(zmq.REP)
+    client_socket.connect("tcp://*:5000")
+
+    for request in range(1,10):
+
+        client_socket.recv()
+        print('Switched to Client for ', request)
+        # Implicit context switch occurs here
+        client_socket.send("World")
+
+publisher = gevent.spawn(server),
+client    = gevent.spawn(client),
+
+gevent.joinall( publisher + client )
+
+]]]
+[[[end]]]
 
 ## WSGI Servers
 
@@ -737,6 +787,40 @@ Performance on Gevent servers is phenomenal.
 
 ## Long Polling
 
+<pre>
+<code class="python">from gevent.queue import Queue, Empty
+from gevent.pywsgi import WSGIServer
+
+data_source = Queue()
+
+def producer():
+    while True:
+        data_source.put_nowait('Hello World')
+        gevent.sleep(1)
+
+def ajax_endpoint(environ, start_response):
+    status = '200 OK'
+    headers = [
+        ('Content-Type', 'application/json')
+    ]
+
+    try:
+        datum = data_source.get(timeout=5)
+    except Empty:
+        datum = []
+
+    start_response(status, headers)
+    return json.dumps(datum)
+
+gevent.spawn(producer)
+
+WSGIServer(('', 8000), ajax_endpoint).serve_forever()
+
+</code>
+</pre> 
+
+## Websockets
+
 ## Chat Server
 
 The final motivating example, a realtime chat room. This example
@@ -758,6 +842,13 @@ import simplejson as json
 
 app = Flask(__name__)
 app.debug = True
+
+rooms = {
+    'topic1': Room(),
+    'topic2': Room(),
+}
+
+users = {}
 
 class Room(object):
 
@@ -781,13 +872,6 @@ class User(object):
 
     def __init__(self):
         self.queue = queue.Queue()
-
-rooms = {
-    'foo': Room(),
-    'bar': Room(),
-}
-
-users = {}
 
 @app.route('/')
 def choose_name():
