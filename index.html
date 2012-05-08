@@ -423,7 +423,7 @@ True
 non-determinism can creep into your program when you beging to
 interact with outside services such as sockets and files. Thus
 even though green threads are a form of "deterministic
-concurrency", they still can experience some of the smae problems
+concurrency", they still can experience some of the same problems
 that posix threads and processes experience.</p>
 <p>The perennial problem involved with concurrency is known as a
 <em>race condition</em>. Simply put is when two concurrent threads
@@ -499,7 +499,7 @@ g.join()
 Hi there!
 </pre></code></p>
 <h2 id="greenlet-state">Greenlet State</h2>
-<p>Like any other segement of code Greenlets can fail in various
+<p>Like any other segment of code Greenlets can fail in various
 ways. A greenlet may fail throw an exception, fail to halt or
 consume too many system resources.</p></p>
 <p>The internal state of a greenlet is generally a time-dependent
@@ -898,7 +898,7 @@ class Actor(gevent.Greenlet):
         self.inbox = queue.Queue()
         Greenlet.__init__(self)
 
-    def recieve(self, message):
+    def receive(self, message):
         """
         Define in your subclass.
         """
@@ -909,7 +909,7 @@ class Actor(gevent.Greenlet):
 
         while self.running:
             message = self.inbox.get()
-            self.recieve(message)
+            self.receive(message)
 
 </code>
 </pre>
@@ -921,13 +921,13 @@ from gevent.queue import Queue
 from gevent import Greenlet
 
 class Pinger(Actor):
-    def recieve(self, message):
+    def receive(self, message):
         print message
         pong.inbox.put('ping')
         gevent.sleep(0)
 
 class Ponger(Actor):
-    def recieve(self, message):
+    def receive(self, message):
         print message
         ping.inbox.put('pong')
         gevent.sleep(0)
