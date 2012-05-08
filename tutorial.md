@@ -192,9 +192,11 @@ same inputs and they always produce the same output. For example
 lets spread a task across a multiprocessing pool compared to a
 gevent pool.
 
-[[[cog
+<pre>
+<code class="python">
+import time
+
 def echo(i):
-    import time
     time.sleep(0.001)
     return i
 
@@ -203,12 +205,12 @@ def echo(i):
 from multiprocessing.pool import Pool
 
 p = Pool(10)
-#run1 = [a for a in p.imap_unordered(echo, xrange(10))]
-#run2 = [a for a in p.imap_unordered(echo, xrange(10))]
-#run3 = [a for a in p.imap_unordered(echo, xrange(10))]
-#run4 = [a for a in p.imap_unordered(echo, xrange(10))]
+run1 = [a for a in p.imap_unordered(echo, xrange(10))]
+run2 = [a for a in p.imap_unordered(echo, xrange(10))]
+run3 = [a for a in p.imap_unordered(echo, xrange(10))]
+run4 = [a for a in p.imap_unordered(echo, xrange(10))]
 
-#print( run1 == run2 == run3 == run4 )
+print( run1 == run2 == run3 == run4 )
 
 # Deterministic Gevent Pool
 
@@ -221,8 +223,13 @@ run3 = [a for a in p.imap_unordered(echo, xrange(10))]
 run4 = [a for a in p.imap_unordered(echo, xrange(10))]
 
 print( run1 == run2 == run3 == run4 )
-]]]
-[[[end]]]
+</code>
+</pre>
+
+<pre>
+<code class="python">False
+True</code>
+</pre>
 
 Even though gevent is normally deterministic, sources of
 non-determinism can creep into your program when you beging to
@@ -757,14 +764,68 @@ gevent.joinall( publisher + client )
 ]]]
 [[[end]]]
 
-## WSGI Servers
+## Simple Telnet Servers
 
 <pre>
-<code class="python">from gevent.pywsgi import WSGIServer
+<code class="python">
+# On Unix: Access with ``$ nc 127.0.0.1 5000`` 
+# On Window: Access with ``$ telnet 127.0.0.1 5000`` 
+
+from gevent.server import StreamServer
+
+def handle(socket, address):
+    socket.send("Hello from a telnet!\n")
+    for i in range(5):
+        socket.send(str(i) + '\n')
+    socket.close()
+
+server = StreamServer(('127.0.0.1', 5000), handle)
+server.serve_forever()
+</code>
+</pre>
+
+## WSGI Servers
+
+Gevent provides two WSGI servers for serving content over HTTP.
+Henceforth called ``wsgi`` and ``pywsgi``:
+
+* gevent.wsgi.WSGIServer
+* gevent.pywsgi.WSGIServer
+
+wsgi is a Python bridge to libev's *very* fast HTTP
+server. It does one job very well. Namely shoving content down a
+network pipe as fast as possible. It is however limited in
+certain HTTP features, the key one being lack chunked transfer
+encoding.
+
+For those familiar with streaming HTTP services, the core idea is
+that in the headers we do not specify a length of the content. We
+instead hold the connection open and flush chunks down the pipe,
+prefixing each with a hex digit indicating the length of the
+chunk. The stream is closed when a size zero chunk is sent.
+
+    HTTP/1.1 200 OK
+    Content-Type: text/plain
+    Transfer-Encoding: chunked
+
+    8
+    <p>Hello
+
+    9
+    World</p>
+
+    0
+
+The above HTTP connection could not be created in wsgi
+because streaming is not supported. It would instead have to
+buffered.
+
+<pre>
+<code class="python">from gevent.wsgi import WSGIServer
 
 def application(environ, start_response):
     status = '200 OK'
-    body = 'Hello Cruel World!'
+    body = '&lt;p&gt;Hello World&lt;/p&gt;'
 
     headers = [
         ('Content-Type', 'text/html')
@@ -778,7 +839,31 @@ WSGIServer(('', 8000), application).serve_forever()
 </code>
 </pre> 
 
-Performance on Gevent servers is phenomenal.
+Using pywsgi we can however write our handler as a generator and
+yield the result chunk by chunk.
+
+<pre>
+<code class="python">from gevent.pywsgi import WSGIServer
+
+def application(environ, start_response):
+    status = '200 OK'
+
+    headers = [
+        ('Content-Type', 'text/html')
+    ]
+
+    start_response(status, headers)
+    yield "&lt;p&gt;Hello"
+    yield "World&lt;/p&gt;"
+
+WSGIServer(('', 8000), application).serve_forever()
+
+</code>
+</pre> 
+
+But regardless, performance on Gevent servers is phenomenal
+compared to other Python servers. libev is a very vetted technology
+and its derivative servers are known to perform well at scale.
 
 <pre>
 <code class="shell">$ ab -n 10000 -c 100 http://127.0.0.1:8000/

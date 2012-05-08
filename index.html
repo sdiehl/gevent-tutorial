@@ -162,6 +162,7 @@ gevent is a concurrency library based around libev.  It provides a clean API for
 </li>
 <li><a href="#real-world-applications">Real World Applications</a><ul>
 <li><a href="#gevent-zeromq">Gevent ZeroMQ</a></li>
+<li><a href="#simple-telnet-servers">Simple Telnet Servers</a></li>
 <li><a href="#wsgi-servers">WSGI Servers</a></li>
 <li><a href="#long-polling">Long Polling</a></li>
 <li><a href="#websockets">Websockets</a></li>
@@ -312,16 +313,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 1 done
+Task 3 done
 Task 5 done
 Task 4 done
-Task 8 done
 Task 6 done
-Task 9 done
 Task 0 done
-Task 3 done
 Task 2 done
+Task 8 done
+Task 1 done
 Task 7 done
+Task 9 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -384,9 +385,11 @@ asynchronous()
 same inputs and they always produce the same output. For example
 lets spread a task across a multiprocessing pool compared to a
 gevent pool.</p>
-<pre><code class="python">
+<pre>
+<code class="python">
+import time
+
 def echo(i):
-    import time
     time.sleep(0.001)
     return i
 
@@ -395,12 +398,12 @@ def echo(i):
 from multiprocessing.pool import Pool
 
 p = Pool(10)
-#run1 = [a for a in p.imap_unordered(echo, xrange(10))]
-#run2 = [a for a in p.imap_unordered(echo, xrange(10))]
-#run3 = [a for a in p.imap_unordered(echo, xrange(10))]
-#run4 = [a for a in p.imap_unordered(echo, xrange(10))]
+run1 = [a for a in p.imap_unordered(echo, xrange(10))]
+run2 = [a for a in p.imap_unordered(echo, xrange(10))]
+run3 = [a for a in p.imap_unordered(echo, xrange(10))]
+run4 = [a for a in p.imap_unordered(echo, xrange(10))]
 
-#print( run1 == run2 == run3 == run4 )
+print( run1 == run2 == run3 == run4 )
 
 # Deterministic Gevent Pool
 
@@ -413,17 +416,19 @@ run3 = [a for a in p.imap_unordered(echo, xrange(10))]
 run4 = [a for a in p.imap_unordered(echo, xrange(10))]
 
 print( run1 == run2 == run3 == run4 )
+</code>
 </pre>
 
-<p></code>
-<pre><code class="python">
-True
-</pre></code></p>
+<pre>
+<code class="python">False
+True</code>
+</pre>
+
 <p>Even though gevent is normally deterministic, sources of
 non-determinism can creep into your program when you beging to
 interact with outside services such as sockets and files. Thus
 even though green threads are a form of "deterministic
-concurrency", they still can experience some of the same problems
+concurrency", they still can experience some of the smae problems
 that posix threads and processes experience.</p>
 <p>The perennial problem involved with concurrency is known as a
 <em>race condition</em>. Simply put is when two concurrent threads
@@ -499,7 +504,7 @@ g.join()
 Hi there!
 </pre></code></p>
 <h2 id="greenlet-state">Greenlet State</h2>
-<p>Like any other segment of code Greenlets can fail in various
+<p>Like any other segement of code Greenlets can fail in various
 ways. A greenlet may fail throw an exception, fail to halt or
 consume too many system resources.</p></p>
 <p>The internal state of a greenlet is generally a time-dependent
@@ -1013,13 +1018,63 @@ Switched to Client for  8
 Switched to Server for  9
 Switched to Client for  9
 </pre></code></p>
-<h2 id="wsgi-servers">WSGI Servers</h2>
+<h2 id="simple-telnet-servers">Simple Telnet Servers</h2>
 <pre>
-<code class="python">from gevent.pywsgi import WSGIServer
+<code class="python">
+# On Unix: Access with ``$ nc 127.0.0.1 5000`` 
+# On Window: Access with ``$ telnet 127.0.0.1 5000``
+
+from gevent.server import StreamServer
+
+def handle(socket, address):
+    socket.send("Hello from a telnet!\n")
+    for i in range(5):
+        socket.send(str(i) + '\n')
+    socket.close()
+
+server = StreamServer(('127.0.0.1', 5000), handle)
+server.serve_forever()
+</code>
+</pre>
+
+<h2 id="wsgi-servers">WSGI Servers</h2>
+<p>Gevent provides two WSGI servers for serving content over HTTP.
+Henceforth called <code>wsgi</code> and <code>pywsgi</code>:</p>
+<ul>
+<li>gevent.wsgi.WSGIServer</li>
+<li>gevent.pywsgi.WSGIServer</li>
+</ul>
+<p>wsgi is a Python bridge to libev's <em>very</em> fast HTTP
+server. It does one job very well. Namely shoving content down a
+network pipe as fast as possible. It is however limited in
+certain HTTP features, the key one being lack chunked transfer
+encoding.</p>
+<p>For those familiar with streaming HTTP services, the core idea is
+that in the headers we do not specify a length of the content. We
+instead hold the connection open and flush chunks down the pipe,
+prefixing each with a hex digit indicating the length of the
+chunk. The stream is closed when a size zero chunk is sent.</p>
+<pre><code>HTTP/1.1 200 OK
+Content-Type: text/plain
+Transfer-Encoding: chunked
+
+8
+&lt;p&gt;Hello
+
+9
+World&lt;/p&gt;
+
+0
+</code></pre>
+<p>The above HTTP connection could not be created in wsgi
+because streaming is not supported. It would instead have to
+buffered.</p>
+<pre>
+<code class="python">from gevent.wsgi import WSGIServer
 
 def application(environ, start_response):
     status = '200 OK'
-    body = 'Hello Cruel World!'
+    body = '&lt;p&gt;Hello World&lt;/p&gt;'
 
     headers = [
         ('Content-Type', 'text/html')
@@ -1033,7 +1088,30 @@ WSGIServer(('', 8000), application).serve_forever()
 </code>
 </pre>
 
-<p>Performance on Gevent servers is phenomenal.</p>
+<p>Using pywsgi we can however write our handler as a generator and
+yield the result chunk by chunk.</p>
+<pre>
+<code class="python">from gevent.pywsgi import WSGIServer
+
+def application(environ, start_response):
+    status = '200 OK'
+
+    headers = [
+        ('Content-Type', 'text/html')
+    ]
+
+    start_response(status, headers)
+    yield "&lt;p&gt;Hello"
+    yield "World&lt;/p&gt;"
+
+WSGIServer(('', 8000), application).serve_forever()
+
+</code>
+</pre>
+
+<p>But regardless, performance on Gevent servers is phenomenal
+compared to other Python servers. libev is a very vetted technology
+and its derivative servers are known to perform well at scale.</p>
 <pre>
 <code class="shell">$ ab -n 10000 -c 100 http://127.0.0.1:8000/
 </code>
