@@ -757,10 +757,10 @@ def client():
         # Implicit context switch occurs here
         client_socket.send("World")
 
-publisher = gevent.spawn(server),
-client    = gevent.spawn(client),
+publisher = gevent.spawn(server)
+client    = gevent.spawn(client)
 
-gevent.joinall( publisher + client )
+gevent.joinall([publisher, client])
 
 ]]]
 [[[end]]]
