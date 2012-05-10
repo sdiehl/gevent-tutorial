@@ -730,6 +730,7 @@ gevent-zeromq``
 
 [[[cog
 # Note: Remember to ``pip install pyzmq gevent_zeromq``
+import gevent
 from gevent_zeromq import zmq
 
 # Global Context
@@ -747,7 +748,7 @@ def server():
 
 def client():
     client_socket = context.socket(zmq.REP)
-    client_socket.connect("tcp://*:5000")
+    client_socket.connect("tcp://127.0.0.1:5000")
 
     for request in range(1,10):
 
