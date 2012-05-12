@@ -903,9 +903,74 @@ gevent.spawn(producer)
 WSGIServer(('', 8000), ajax_endpoint).serve_forever()
 
 </code>
-</pre> 
+</pre>
 
 ## Websockets
+
+Websocket example which requires <a href="https://bitbucket.org/Jeffrey/gevent-websocket/src">gevent-websocket</a>.
+
+
+<pre>
+<code class="python"># Simple gevent-websocket server
+import json
+import random
+
+from gevent import pywsgi, sleep
+from geventwebsocket.handler import WebSocketHandler
+
+class WebSocketApp(object):
+    '''Send random data to the websocket'''
+
+    def __call__(self, environ, start_response):
+        ws = environ['wsgi.websocket']
+        x = 0
+        while True:
+            data = json.dumps({'x': x, 'y': random.randint(1, 5)})
+            ws.send(data)
+            x += 1
+            sleep(0.5)
+
+server = pywsgi.WSGIServer(("", 10000), WebSocketApp(),
+    handler_class=WebSocketHandler)
+server.serve_forever()
+</code>
+</pre>
+
+HTML Page:
+
+    <html>
+        <head>
+            <title>Minimal websocket application</title>
+            <script type="text/javascript" src="jquery.min.js"></script>
+            <script type="text/javascript">
+            $(function() {
+                // Open up a connection to our server
+                var ws = new WebSocket("ws://localhost:10000/");
+
+                // What do we do when we get a message?
+                ws.onmessage = function(evt) {
+                    $("#placeholder").append('<p>' + evt.data + '</p>')
+                }
+                // Just update our conn_status field with the connection status
+                ws.onopen = function(evt) {
+                    $('#conn_status').html('<b>Connected</b>');
+                }
+                ws.onerror = function(evt) {
+                    $('#conn_status').html('<b>Error</b>');
+                }
+                ws.onclose = function(evt) {
+                    $('#conn_status').html('<b>Closed</b>');
+                }
+            });
+        </script>
+        </head>
+        <body>
+            <h1>WebSocket Example</h1>
+            <div id="conn_status">Not Connected</div>
+            <div id="placeholder" style="width:600px;height:300px;"></div>
+        </body>
+    </html>
+
 
 ## Chat Server
 
