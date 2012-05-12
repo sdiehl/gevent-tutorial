@@ -1151,6 +1151,67 @@ WSGIServer(('', 8000), ajax_endpoint).serve_forever()
 </pre>
 
 <h2 id="websockets">Websockets</h2>
+<p>Websocket example which requires <a href="https://bitbucket.org/Jeffrey/gevent-websocket/src">gevent-websocket</a>.</p>
+<pre>
+<code class="python"># Simple gevent-websocket server
+import json
+import random
+
+from gevent import pywsgi, sleep
+from geventwebsocket.handler import WebSocketHandler
+
+class WebSocketApp(object):
+    '''Send random data to the websocket'''
+
+    def __call__(self, environ, start_response):
+        ws = environ['wsgi.websocket']
+        x = 0
+        while True:
+            data = json.dumps({'x': x, 'y': random.randint(1, 5)})
+            ws.send(data)
+            x += 1
+            sleep(0.5)
+
+server = pywsgi.WSGIServer(("", 10000), WebSocketApp(),
+    handler_class=WebSocketHandler)
+server.serve_forever()
+</code>
+</pre>
+
+<p>HTML Page:</p>
+<pre><code>&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Minimal websocket application&lt;/title&gt;
+        &lt;script type="text/javascript" src="jquery.min.js"&gt;&lt;/script&gt;
+        &lt;script type="text/javascript"&gt;
+        $(function() {
+            // Open up a connection to our server
+            var ws = new WebSocket("ws://localhost:10000/");
+
+            // What do we do when we get a message?
+            ws.onmessage = function(evt) {
+                $("#placeholder").append('&lt;p&gt;' + evt.data + '&lt;/p&gt;')
+            }
+            // Just update our conn_status field with the connection status
+            ws.onopen = function(evt) {
+                $('#conn_status').html('&lt;b&gt;Connected&lt;/b&gt;');
+            }
+            ws.onerror = function(evt) {
+                $('#conn_status').html('&lt;b&gt;Error&lt;/b&gt;');
+            }
+            ws.onclose = function(evt) {
+                $('#conn_status').html('&lt;b&gt;Closed&lt;/b&gt;');
+            }
+        });
+    &lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;h1&gt;WebSocket Example&lt;/h1&gt;
+        &lt;div id="conn_status"&gt;Not Connected&lt;/div&gt;
+        &lt;div id="placeholder" style="width:600px;height:300px;"&gt;&lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
 <h2 id="chat-server">Chat Server</h2>
 <p>The final motivating example, a realtime chat room. This example
 requires <a href="http://flask.pocoo.org/">Flask</a> ( but not neccesarily so, you could use Django,
