@@ -71,6 +71,12 @@ gevent.joinall([
 ]]]
 [[[end]]]
 
+It is illuminating to visualize the control of the program or
+walk through it with a debugger to see the context switches as
+they occur.
+
+![Greenlet Control Flow](flow.gif)
+
 The real power of gevent comes when we use it for network and IO
 bound functions which can be cooperatively scheduled. Gevent has
 taken care of all the details to ensure that your network

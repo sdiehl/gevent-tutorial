@@ -242,6 +242,10 @@ Emplict context to bar
 Emplict context switch to foo again
 Implicit swtich switch back to bar
 </pre></code></p>
+<p>It is illuminating to visualize the control of the program or
+walk through it with a debugger to see the context switches as
+they occur.</p>
+<p><img alt="Greenlet Control Flow" src="flow.gif" /></p>
 <p>The real power of gevent comes when we use it for network and IO
 bound functions which can be cooperatively scheduled. Gevent has
 taken care of all the details to ensure that your network
@@ -332,16 +336,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 4 done
-Task 5 done
-Task 2 done
 Task 0 done
-Task 9 done
+Task 2 done
+Task 5 done
 Task 7 done
+Task 1 done
 Task 3 done
 Task 6 done
+Task 9 done
+Task 4 done
 Task 8 done
-Task 1 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
