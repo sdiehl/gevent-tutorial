@@ -1,12 +1,31 @@
 [TOC]
 
-# Core
+# Introduction
 
 The structure of this tutorial assumes an intermediate level
 knowledge of Python but not much else. No knowledge of
 concurrency is expected. The goal is to give you
-the tools you need to get going with gevent and use it to solve
-or speed up your applications today.
+the tools you need to get going with gevent, help you tame
+your existing concurrency problems and start writing asynchronous
+applications today.
+
+### Contributors
+
+In chronological order of contribution: 
+[Stephen Diehl](http://www.stephendiehl.com)
+[J&eacute;r&eacute;my Bethmont](https://github.com/jerem)
+[sww](https://github.com/sww)
+[Bruno Bigras](https://github.com/brunoqc)
+[David Ripton](https://github.com/dripton)
+[Travis Cline](https://github.com/traviscline)
+[Boris Feld](https://github.com/Lothiraldan)
+
+This is a collaborative document published under MIT license.
+Have something to add? See a typo? Fork and issue a
+pull request [Github](https://github.com/sdiehl/gevent-tutorial).
+Any and all contributions are welcome.
+
+# Core
 
 ## Greenlets
 
@@ -903,9 +922,74 @@ gevent.spawn(producer)
 WSGIServer(('', 8000), ajax_endpoint).serve_forever()
 
 </code>
-</pre> 
+</pre>
 
 ## Websockets
+
+Websocket example which requires <a href="https://bitbucket.org/Jeffrey/gevent-websocket/src">gevent-websocket</a>.
+
+
+<pre>
+<code class="python"># Simple gevent-websocket server
+import json
+import random
+
+from gevent import pywsgi, sleep
+from geventwebsocket.handler import WebSocketHandler
+
+class WebSocketApp(object):
+    '''Send random data to the websocket'''
+
+    def __call__(self, environ, start_response):
+        ws = environ['wsgi.websocket']
+        x = 0
+        while True:
+            data = json.dumps({'x': x, 'y': random.randint(1, 5)})
+            ws.send(data)
+            x += 1
+            sleep(0.5)
+
+server = pywsgi.WSGIServer(("", 10000), WebSocketApp(),
+    handler_class=WebSocketHandler)
+server.serve_forever()
+</code>
+</pre>
+
+HTML Page:
+
+    <html>
+        <head>
+            <title>Minimal websocket application</title>
+            <script type="text/javascript" src="jquery.min.js"></script>
+            <script type="text/javascript">
+            $(function() {
+                // Open up a connection to our server
+                var ws = new WebSocket("ws://localhost:10000/");
+
+                // What do we do when we get a message?
+                ws.onmessage = function(evt) {
+                    $("#placeholder").append('<p>' + evt.data + '</p>')
+                }
+                // Just update our conn_status field with the connection status
+                ws.onopen = function(evt) {
+                    $('#conn_status').html('<b>Connected</b>');
+                }
+                ws.onerror = function(evt) {
+                    $('#conn_status').html('<b>Error</b>');
+                }
+                ws.onclose = function(evt) {
+                    $('#conn_status').html('<b>Closed</b>');
+                }
+            });
+        </script>
+        </head>
+        <body>
+            <h1>WebSocket Example</h1>
+            <div id="conn_status">Not Connected</div>
+            <div id="placeholder" style="width:600px;height:300px;"></div>
+        </body>
+    </html>
+
 
 ## Chat Server
 

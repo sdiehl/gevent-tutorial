@@ -128,7 +128,7 @@
 <header>
     <h1><span class="green">gevent</span> For the Working Python Developer</h1>
     <h3 class="author">
-        <a href="http://www.stephendiehl.com">Stephen Diehl</a>
+        Written by the Gevent Community
     </h3>
 </header>
 
@@ -138,6 +138,10 @@ gevent is a concurrency library based around libev.  It provides a clean API for
 
 <div class="toc">
 <ul>
+<li><a href="#introduction">Introduction</a><ul>
+<li><a href="#contributors">Contributors</a></li>
+</ul>
+</li>
 <li><a href="#core">Core</a><ul>
 <li><a href="#greenlets">Greenlets</a></li>
 <li><a href="#synchronous-asynchronous-execution">Synchronous &amp; Asynchronous Execution</a></li>
@@ -172,12 +176,27 @@ gevent is a concurrency library based around libev.  It provides a clean API for
 </li>
 </ul>
 </div>
-<h1 id="core">Core</h1>
+<h1 id="introduction">Introduction</h1>
 <p>The structure of this tutorial assumes an intermediate level
 knowledge of Python but not much else. No knowledge of
 concurrency is expected. The goal is to give you
-the tools you need to get going with gevent and use it to solve
-or speed up your applications today.</p>
+the tools you need to get going with gevent, help you tame
+your existing concurrency problems and start writing asynchronous
+applications today.</p>
+<h3 id="contributors">Contributors</h3>
+<p>In chronological order of contribution: 
+<a href="http://www.stephendiehl.com">Stephen Diehl</a>
+<a href="https://github.com/jerem">J&eacute;r&eacute;my Bethmont</a>
+<a href="https://github.com/sww">sww</a>
+<a href="https://github.com/brunoqc">Bruno Bigras</a>
+<a href="https://github.com/dripton">David Ripton</a>
+<a href="https://github.com/traviscline">Travis Cline</a>
+<a href="https://github.com/Lothiraldan">Boris Feld</a></p>
+<p>This is a collaborative document published under MIT license.
+Have something to add? See a typo? Fork and issue a
+pull request <a href="https://github.com/sdiehl/gevent-tutorial">Github</a>.
+Any and all contributions are welcome.</p>
+<h1 id="core">Core</h1>
 <h2 id="greenlets">Greenlets</h2>
 <p>The primary pattern used in gevent is the <strong>Greenlet</strong>, a
 lightweight coroutine provided to Python as a C extension module.
@@ -313,15 +332,15 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 2 done
-Task 5 done
-Task 6 done
-Task 0 done
-Task 3 done
-Task 8 done
 Task 4 done
+Task 5 done
+Task 2 done
+Task 0 done
 Task 9 done
 Task 7 done
+Task 3 done
+Task 6 done
+Task 8 done
 Task 1 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
@@ -1152,6 +1171,67 @@ WSGIServer(('', 8000), ajax_endpoint).serve_forever()
 </pre>
 
 <h2 id="websockets">Websockets</h2>
+<p>Websocket example which requires <a href="https://bitbucket.org/Jeffrey/gevent-websocket/src">gevent-websocket</a>.</p>
+<pre>
+<code class="python"># Simple gevent-websocket server
+import json
+import random
+
+from gevent import pywsgi, sleep
+from geventwebsocket.handler import WebSocketHandler
+
+class WebSocketApp(object):
+    '''Send random data to the websocket'''
+
+    def __call__(self, environ, start_response):
+        ws = environ['wsgi.websocket']
+        x = 0
+        while True:
+            data = json.dumps({'x': x, 'y': random.randint(1, 5)})
+            ws.send(data)
+            x += 1
+            sleep(0.5)
+
+server = pywsgi.WSGIServer(("", 10000), WebSocketApp(),
+    handler_class=WebSocketHandler)
+server.serve_forever()
+</code>
+</pre>
+
+<p>HTML Page:</p>
+<pre><code>&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Minimal websocket application&lt;/title&gt;
+        &lt;script type="text/javascript" src="jquery.min.js"&gt;&lt;/script&gt;
+        &lt;script type="text/javascript"&gt;
+        $(function() {
+            // Open up a connection to our server
+            var ws = new WebSocket("ws://localhost:10000/");
+
+            // What do we do when we get a message?
+            ws.onmessage = function(evt) {
+                $("#placeholder").append('&lt;p&gt;' + evt.data + '&lt;/p&gt;')
+            }
+            // Just update our conn_status field with the connection status
+            ws.onopen = function(evt) {
+                $('#conn_status').html('&lt;b&gt;Connected&lt;/b&gt;');
+            }
+            ws.onerror = function(evt) {
+                $('#conn_status').html('&lt;b&gt;Error&lt;/b&gt;');
+            }
+            ws.onclose = function(evt) {
+                $('#conn_status').html('&lt;b&gt;Closed&lt;/b&gt;');
+            }
+        });
+    &lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;h1&gt;WebSocket Example&lt;/h1&gt;
+        &lt;div id="conn_status"&gt;Not Connected&lt;/div&gt;
+        &lt;div id="placeholder" style="width:600px;height:300px;"&gt;&lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
 <h2 id="chat-server">Chat Server</h2>
 <p>The final motivating example, a realtime chat room. This example
 requires <a href="http://flask.pocoo.org/">Flask</a> ( but not neccesarily so, you could use Django,
