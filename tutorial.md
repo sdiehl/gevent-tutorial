@@ -1,12 +1,31 @@
 [TOC]
 
-# Core
+# Introduction
 
 The structure of this tutorial assumes an intermediate level
 knowledge of Python but not much else. No knowledge of
 concurrency is expected. The goal is to give you
-the tools you need to get going with gevent and use it to solve
-or speed up your applications today.
+the tools you need to get going with gevent, help you tame
+your existing concurrency problems and start writing asynchronous
+applications today.
+
+### Contributors
+
+In chronological order of contribution: 
+[Stephen Diehl](http://www.stephendiehl.com)
+[J&eacute;r&eacute;my Bethmont](https://github.com/jerem)
+[sww](https://github.com/sww)
+[Bruno Bigras](https://github.com/brunoqc)
+[David Ripton](https://github.com/dripton)
+[Travis Cline](https://github.com/traviscline)
+[Boris Feld](https://github.com/Lothiraldan)
+
+This is a collaborative document published under MIT license.
+Have something to add? See a typo? Fork and issue a
+pull request [Github](https://github.com/sdiehl/gevent-tutorial).
+Any and all contributions are welcome.
+
+# Core
 
 ## Greenlets
 
