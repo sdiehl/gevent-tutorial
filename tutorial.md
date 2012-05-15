@@ -425,6 +425,7 @@ Greenlet.
 
 <pre>
 <code class="python">
+import gevent
 from gevent import Timeout
 
 seconds = 10
@@ -899,8 +900,10 @@ and its derivative servers are known to perform well at scale.
 ## Long Polling
 
 <pre>
-<code class="python">from gevent.queue import Queue, Empty
+<code class="python">import gevent
+from gevent.queue import Queue, Empty
 from gevent.pywsgi import WSGIServer
+import simplejson as json
 
 data_source = Queue()
 
