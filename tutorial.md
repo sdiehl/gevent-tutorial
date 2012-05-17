@@ -19,6 +19,8 @@ In chronological order of contribution:
 [David Ripton](https://github.com/dripton)
 [Travis Cline](https://github.com/traviscline)
 [Boris Feld](https://github.com/Lothiraldan)
+[youngsterxyf](https://github.com/youngsterxyf)
+[Eddie Hebert](https://github.com/ehebert)
 
 This is a collaborative document published under MIT license.
 Have something to add? See a typo? Fork and issue a
@@ -764,7 +766,7 @@ context = zmq.Context()
 
 def server():
     server_socket = context.socket(zmq.REQ)
-    server_socket.bind("tcp://*:5000")
+    server_socket.bind("tcp://127.0.0.1:5000")
 
     for request in range(1,10):
         server_socket.send("Hello")
@@ -1102,8 +1104,3 @@ if __name__ == "__main__":
     http.serve_forever()
 </code>
 </pre>
-
-## License
-
-This is a collaborative document published under MIT license. Forking 
-on <a href="https://github.com/sdiehl/gevent-tutorial">GitHub</a> is encouraged

@@ -133,7 +133,7 @@
 </header>
 
 <blockquote>
-gevent is a concurrency library based around libev.  It provides a clean API for a variety of concurrency and network related tasks.
+gevent is a concurrency library based around <a href="http://software.schmorp.de/pkg/libev.html">libev</a>.  It provides a clean API for a variety of concurrency and network related tasks.
 </blockquote>
 
 <div class="toc">
@@ -171,7 +171,6 @@ gevent is a concurrency library based around libev.  It provides a clean API for
 <li><a href="#long-polling">Long Polling</a></li>
 <li><a href="#websockets">Websockets</a></li>
 <li><a href="#chat-server">Chat Server</a></li>
-<li><a href="#license">License</a></li>
 </ul>
 </li>
 </ul>
@@ -191,7 +190,9 @@ applications today.</p>
 <a href="https://github.com/brunoqc">Bruno Bigras</a>
 <a href="https://github.com/dripton">David Ripton</a>
 <a href="https://github.com/traviscline">Travis Cline</a>
-<a href="https://github.com/Lothiraldan">Boris Feld</a></p>
+<a href="https://github.com/Lothiraldan">Boris Feld</a>
+<a href="https://github.com/youngsterxyf">youngsterxyf</a>
+<a href="https://github.com/ehebert">Eddie Hebert</a></p>
 <p>This is a collaborative document published under MIT license.
 Have something to add? See a typo? Fork and issue a
 pull request <a href="https://github.com/sdiehl/gevent-tutorial">Github</a>.
@@ -203,7 +204,7 @@ lightweight coroutine provided to Python as a C extension module.
 Greenlets all run inside of the OS process for the main
 program but are scheduled cooperatively. This differs from any of
 the real parallelism constructs provided by <code>multiprocessing</code> or
-<code>multithreading</code> libraries which do spin processes and posix threads
+<code>multithreading</code> libraries which do spin processes and POSIX threads
 which are truly parallel.</p>
 <h2 id="synchronous-asynchronous-execution">Synchronous &amp; Asynchronous Execution</h2>
 <p>The core idea of concurrency is that a larger task can be broken
@@ -336,16 +337,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
+Task 6 done
 Task 0 done
-Task 2 done
 Task 5 done
+Task 3 done
+Task 8 done
+Task 2 done
+Task 4 done
 Task 7 done
 Task 1 done
-Task 3 done
-Task 6 done
 Task 9 done
-Task 4 done
-Task 8 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -451,8 +452,8 @@ True</code>
 non-determinism can creep into your program when you beging to
 interact with outside services such as sockets and files. Thus
 even though green threads are a form of "deterministic
-concurrency", they still can experience some of the smae problems
-that posix threads and processes experience.</p>
+concurrency", they still can experience some of the same problems
+that POSIX threads and processes experience.</p>
 <p>The perennial problem involved with concurrency is known as a
 <em>race condition</em>. Simply put is when two concurrent threads
 / processes depend on some shared resource but also attempt to
@@ -621,6 +622,7 @@ if __name__ == '__main__':
 Greenlet.</p>
 <pre>
 <code class="python">
+import gevent
 from gevent import Timeout
 
 seconds = 10
@@ -995,7 +997,7 @@ context = zmq.Context()
 
 def server():
     server_socket = context.socket(zmq.REQ)
-    server_socket.bind("tcp://*:5000")
+    server_socket.bind("tcp://127.0.0.1:5000")
 
     for request in range(1,10):
         server_socket.send("Hello")
@@ -1143,8 +1145,10 @@ and its derivative servers are known to perform well at scale.</p>
 
 <h2 id="long-polling">Long Polling</h2>
 <pre>
-<code class="python">from gevent.queue import Queue, Empty
+<code class="python">import gevent
+from gevent.queue import Queue, Empty
 from gevent.pywsgi import WSGIServer
+import simplejson as json
 
 data_source = Queue()
 
@@ -1335,10 +1339,6 @@ if __name__ == "__main__":
     http.serve_forever()
 </code>
 </pre>
-
-<h2 id="license">License</h2>
-<p>This is a collaborative document published under MIT license. Forking 
-on <a href="https://github.com/sdiehl/gevent-tutorial">GitHub</a> is encouraged</p>
 </div>
 </body>
 </html>
