@@ -34,7 +34,7 @@ lightweight coroutine provided to Python as a C extension module.
 Greenlets all run inside of the OS process for the main
 program but are scheduled cooperatively. This differs from any of
 the real parallelism constructs provided by ``multiprocessing`` or
-``multithreading`` libraries which do spin processes and posix threads
+``multithreading`` libraries which do spin processes and POSIX threads
 which are truly parallel.
 
 ## Synchronous & Asynchronous Execution
@@ -260,8 +260,8 @@ Even though gevent is normally deterministic, sources of
 non-determinism can creep into your program when you beging to
 interact with outside services such as sockets and files. Thus
 even though green threads are a form of "deterministic
-concurrency", they still can experience some of the smae problems
-that posix threads and processes experience.
+concurrency", they still can experience some of the same problems
+that POSIX threads and processes experience.
 
 The perennial problem involved with concurrency is known as a
 *race condition*. Simply put is when two concurrent threads
