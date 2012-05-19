@@ -223,12 +223,12 @@ import gevent
 def foo():
     print('Running in foo')
     gevent.sleep(0)
-    print('Emplict context switch to foo again')
+    print('Explicit context switch to foo again')
 
 def bar():
-    print('Emplict context to bar')
+    print('Explicit context to bar')
     gevent.sleep(0)
-    print('Implicit swtich switch back to bar')
+    print('Implicit context switch back to bar')
 
 gevent.joinall([
     gevent.spawn(foo),
@@ -239,9 +239,9 @@ gevent.joinall([
 <p></code>
 <pre><code class="python">
 Running in foo
-Emplict context to bar
-Emplict context switch to foo again
-Implicit swtich switch back to bar
+Explicit context to bar
+Explicit context switch to foo again
+Implicit context switch back to bar
 </pre></code></p>
 <p>It is illuminating to visualize the control of the program or
 walk through it with a debugger to see the context switches as
@@ -337,15 +337,15 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
+Task 1 done
 Task 6 done
-Task 0 done
 Task 5 done
 Task 3 done
 Task 8 done
 Task 2 done
 Task 4 done
 Task 7 done
-Task 1 done
+Task 0 done
 Task 9 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,

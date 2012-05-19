@@ -59,12 +59,12 @@ import gevent
 def foo():
     print('Running in foo')
     gevent.sleep(0)
-    print('Emplict context switch to foo again')
+    print('Explicit context switch to foo again')
 
 def bar():
-    print('Emplict context to bar')
+    print('Explicit context to bar')
     gevent.sleep(0)
-    print('Implicit swtich switch back to bar')
+    print('Implicit context switch back to bar')
 
 gevent.joinall([
     gevent.spawn(foo),
