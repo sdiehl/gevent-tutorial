@@ -21,6 +21,7 @@ In chronological order of contribution:
 [Boris Feld](https://github.com/Lothiraldan)
 [youngsterxyf](https://github.com/youngsterxyf)
 [Eddie Hebert](https://github.com/ehebert)
+[Alexis Metaireau](http://notmyidea.org)
 
 This is a collaborative document published under MIT license.
 Have something to add? See a typo? Fork and issue a
@@ -46,7 +47,7 @@ down into a collection of subtasks whose operation does not
 depend on the other tasks and thus can be run 
 *asynchronously* instead of one at a time 
 *synchronously*. A switch between the two
-executions is known as a *context swtich*.
+executions is known as a *context switch*.
 
 A context switch in gevent done through
 *yielding*. In this case example we have
@@ -82,7 +83,7 @@ they occur.
 The real power of gevent comes when we use it for network and IO
 bound functions which can be cooperatively scheduled. Gevent has
 taken care of all the details to ensure that your network
-libraries will implictly yield their greenlet contexts whenever
+libraries will implicitly yield their greenlet contexts whenever
 possible. I cannot stress enough what a powerful idiom this is.
 But maybe an example will illustrate.
 
@@ -259,7 +260,7 @@ True</code>
 </pre>
 
 Even though gevent is normally deterministic, sources of
-non-determinism can creep into your program when you beging to
+non-determinism can creep into your program when you begin to
 interact with outside services such as sockets and files. Thus
 even though green threads are a form of "deterministic
 concurrency", they still can experience some of the same problems
@@ -300,7 +301,7 @@ def foo(message, n):
 thread1 = Greenlet.spawn(foo, "Hello", 1)
 
 # Wrapper for creating and runing a new Greenlet from the named 
-# function foo, with the passd arguments
+# function foo, with the passed arguments
 thread2 = gevent.spawn(foo, "I live!", 2)
 
 # Lambda expressions
@@ -339,8 +340,8 @@ g.join()
 
 ## Greenlet State
 
-Like any other segement of code Greenlets can fail in various
-ways. A greenlet may fail throw an exception, fail to halt or
+Like any other segment of code, Greenlets can fail in various
+ways. A greenlet may fail to throw an exception, fail to halt or
 consume too many system resources.</p>
 
 <p>The internal state of a greenlet is generally a time-dependent

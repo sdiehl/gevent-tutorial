@@ -192,7 +192,8 @@ applications today.</p>
 <a href="https://github.com/traviscline">Travis Cline</a>
 <a href="https://github.com/Lothiraldan">Boris Feld</a>
 <a href="https://github.com/youngsterxyf">youngsterxyf</a>
-<a href="https://github.com/ehebert">Eddie Hebert</a></p>
+<a href="https://github.com/ehebert">Eddie Hebert</a>
+<a href="http://notmyidea.org">Alexis Metaireau</a></p>
 <p>This is a collaborative document published under MIT license.
 Have something to add? See a typo? Fork and issue a
 pull request <a href="https://github.com/sdiehl/gevent-tutorial">Github</a>.
@@ -212,7 +213,7 @@ down into a collection of subtasks whose operation does not
 depend on the other tasks and thus can be run 
 <em>asynchronously</em> instead of one at a time 
 <em>synchronously</em>. A switch between the two
-executions is known as a <em>context swtich</em>.</p>
+executions is known as a <em>context switch</em>.</p>
 <p>A context switch in gevent done through
 <em>yielding</em>. In this case example we have
 two contexts which yield to each other through invoking 
@@ -250,7 +251,7 @@ they occur.</p>
 <p>The real power of gevent comes when we use it for network and IO
 bound functions which can be cooperatively scheduled. Gevent has
 taken care of all the details to ensure that your network
-libraries will implictly yield their greenlet contexts whenever
+libraries will implicitly yield their greenlet contexts whenever
 possible. I cannot stress enough what a powerful idiom this is.
 But maybe an example will illustrate.</p>
 <pre><code class="python">
@@ -337,16 +338,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 1 done
-Task 6 done
-Task 5 done
-Task 3 done
-Task 8 done
 Task 2 done
+Task 6 done
+Task 8 done
+Task 3 done
 Task 4 done
 Task 7 done
-Task 0 done
+Task 1 done
 Task 9 done
+Task 0 done
+Task 5 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -449,7 +450,7 @@ True</code>
 </pre>
 
 <p>Even though gevent is normally deterministic, sources of
-non-determinism can creep into your program when you beging to
+non-determinism can creep into your program when you begin to
 interact with outside services such as sockets and files. Thus
 even though green threads are a form of "deterministic
 concurrency", they still can experience some of the same problems
@@ -485,7 +486,7 @@ def foo(message, n):
 thread1 = Greenlet.spawn(foo, "Hello", 1)
 
 # Wrapper for creating and runing a new Greenlet from the named 
-# function foo, with the passd arguments
+# function foo, with the passed arguments
 thread2 = gevent.spawn(foo, "I live!", 2)
 
 # Lambda expressions
@@ -528,8 +529,8 @@ g.join()
 Hi there!
 </pre></code></p>
 <h2 id="greenlet-state">Greenlet State</h2>
-<p>Like any other segement of code Greenlets can fail in various
-ways. A greenlet may fail throw an exception, fail to halt or
+<p>Like any other segment of code, Greenlets can fail in various
+ways. A greenlet may fail to throw an exception, fail to halt or
 consume too many system resources.</p></p>
 <p>The internal state of a greenlet is generally a time-dependent
 parameter. There are a number of flags on greenlets which let
