@@ -74,9 +74,8 @@ gevent.joinall([
 ]]]
 [[[end]]]
 
-It is illuminating to visualize the control of the program or
-walk through it with a debugger to see the context switches as
-they occur.
+It is illuminating to visualize the control flow of the program or walk
+through it with a debugger to see the context switches as they occur.
 
 ![Greenlet Control Flow](flow.gif)
 
@@ -822,11 +821,18 @@ Henceforth called ``wsgi`` and ``pywsgi``:
 * gevent.wsgi.WSGIServer
 * gevent.pywsgi.WSGIServer
 
-wsgi is a Python bridge to libev's *very* fast HTTP
-server. It does one job very well. Namely shoving content down a
-network pipe as fast as possible. It is however limited in
-certain HTTP features, the key one being lack chunked transfer
-encoding.
+In earlier versions of gevent before 1.0.x, gevent used libevent
+instead of libev. Libevent included a fast HTTP server which was
+used by gevent's ``wsgi`` server. 
+
+In gevent 1.0.x there is no http server included. Instead
+``gevent.wsgi`` it is now an alias for the pure Python server in
+``gevent.pywsgi``.
+
+
+## Streaming Servers
+
+**If you are using gevent 1.0.x, this section does not apply**
 
 For those familiar with streaming HTTP services, the core idea is
 that in the headers we do not specify a length of the content. We
@@ -894,6 +900,10 @@ WSGIServer(('', 8000), application).serve_forever()
 But regardless, performance on Gevent servers is phenomenal
 compared to other Python servers. libev is a very vetted technology
 and its derivative servers are known to perform well at scale.
+
+To benchmark, try Apache Benchmark ``ab`` or see this 
+[Benchmark of Python WSGI Servers](http://nichol.as/benchmark-of-python-web-servers) 
+for comparison with other servers.
 
 <pre>
 <code class="shell">$ ab -n 10000 -c 100 http://127.0.0.1:8000/

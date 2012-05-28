@@ -168,6 +168,7 @@ gevent is a concurrency library based around <a href="http://software.schmorp.de
 <li><a href="#gevent-zeromq">Gevent ZeroMQ</a></li>
 <li><a href="#simple-telnet-servers">Simple Telnet Servers</a></li>
 <li><a href="#wsgi-servers">WSGI Servers</a></li>
+<li><a href="#streaming-servers">Streaming Servers</a></li>
 <li><a href="#long-polling">Long Polling</a></li>
 <li><a href="#websockets">Websockets</a></li>
 <li><a href="#chat-server">Chat Server</a></li>
@@ -244,9 +245,8 @@ Explicit context to bar
 Explicit context switch to foo again
 Implicit context switch back to bar
 </pre></code></p>
-<p>It is illuminating to visualize the control of the program or
-walk through it with a debugger to see the context switches as
-they occur.</p>
+<p>It is illuminating to visualize the control flow of the program or walk
+through it with a debugger to see the context switches as they occur.</p>
 <p><img alt="Greenlet Control Flow" src="flow.gif" /></p>
 <p>The real power of gevent comes when we use it for network and IO
 bound functions which can be cooperatively scheduled. Gevent has
@@ -338,16 +338,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 2 done
-Task 6 done
-Task 8 done
-Task 3 done
-Task 4 done
-Task 7 done
 Task 1 done
-Task 9 done
-Task 0 done
+Task 6 done
 Task 5 done
+Task 0 done
+Task 9 done
+Task 8 done
+Task 7 done
+Task 4 done
+Task 3 done
+Task 2 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -1071,11 +1071,14 @@ Henceforth called <code>wsgi</code> and <code>pywsgi</code>:</p>
 <li>gevent.wsgi.WSGIServer</li>
 <li>gevent.pywsgi.WSGIServer</li>
 </ul>
-<p>wsgi is a Python bridge to libev's <em>very</em> fast HTTP
-server. It does one job very well. Namely shoving content down a
-network pipe as fast as possible. It is however limited in
-certain HTTP features, the key one being lack chunked transfer
-encoding.</p>
+<p>In earlier versions of gevent before 1.0.x, gevent used libevent
+instead of libev. Libevent included a fast HTTP server which was
+used by gevent's <code>wsgi</code> server. </p>
+<p>In gevent 1.0.x there is no http server included. Instead
+<code>gevent.wsgi</code> it is now an alias for the pure Python server in
+<code>gevent.pywsgi</code>.</p>
+<h2 id="streaming-servers">Streaming Servers</h2>
+<p><strong>If you are using gevent 1.0.x, this section does not apply</strong></p>
 <p>For those familiar with streaming HTTP services, the core idea is
 that in the headers we do not specify a length of the content. We
 instead hold the connection open and flush chunks down the pipe,
@@ -1139,6 +1142,9 @@ WSGIServer(('', 8000), application).serve_forever()
 <p>But regardless, performance on Gevent servers is phenomenal
 compared to other Python servers. libev is a very vetted technology
 and its derivative servers are known to perform well at scale.</p>
+<p>To benchmark, try Apache Benchmark <code>ab</code> or see this 
+<a href="http://nichol.as/benchmark-of-python-web-servers">Benchmark of Python WSGI Servers</a> 
+for comparison with other servers.</p>
 <pre>
 <code class="shell">$ ab -n 10000 -c 100 http://127.0.0.1:8000/
 </code>
