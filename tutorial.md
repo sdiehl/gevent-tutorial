@@ -49,7 +49,7 @@ depend on the other tasks and thus can be run
 *synchronously*. A switch between the two
 executions is known as a *context switch*.
 
-A context switch in gevent done through
+A context switch in gevent is done through
 *yielding*. In this case example we have
 two contexts which yield to each other through invoking 
 ``gevent.sleep(0)``.
@@ -317,6 +317,7 @@ In addition to using the base Greenlet class, you may also subclass
 Greenlet class and overload the ``_run`` method.
 
 [[[cog
+import gevent
 from gevent import Greenlet
 
 class MyGreenlet(Greenlet):
@@ -685,11 +686,13 @@ one very simply using a Queue inside of a subclassed Greenlet.
 
 <pre>
 <code class="python">import gevent
+from gevent.queue import Queue
+
 
 class Actor(gevent.Greenlet):
 
     def __init__(self):
-        self.inbox = queue.Queue()
+        self.inbox = Queue()
         Greenlet.__init__(self)
 
     def receive(self, message):
@@ -826,7 +829,7 @@ instead of libev. Libevent included a fast HTTP server which was
 used by gevent's ``wsgi`` server. 
 
 In gevent 1.0.x there is no http server included. Instead
-``gevent.wsgi`` it is now an alias for the pure Python server in
+``gevent.wsgi`` is now an alias for the pure Python server in
 ``gevent.pywsgi``.
 
 
