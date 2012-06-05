@@ -194,7 +194,8 @@ applications today.</p>
 <a href="https://github.com/Lothiraldan">Boris Feld</a>
 <a href="https://github.com/youngsterxyf">youngsterxyf</a>
 <a href="https://github.com/ehebert">Eddie Hebert</a>
-<a href="http://notmyidea.org">Alexis Metaireau</a></p>
+<a href="http://notmyidea.org">Alexis Metaireau</a>
+<a href="https://github.com/djv">Daniel Velkov</a></p>
 <p>This is a collaborative document published under MIT license.
 Have something to add? See a typo? Fork and issue a
 pull request <a href="https://github.com/sdiehl/gevent-tutorial">Github</a>.
@@ -215,7 +216,7 @@ depend on the other tasks and thus can be run
 <em>asynchronously</em> instead of one at a time 
 <em>synchronously</em>. A switch between the two
 executions is known as a <em>context switch</em>.</p>
-<p>A context switch in gevent done through
+<p>A context switch in gevent is done through
 <em>yielding</em>. In this case example we have
 two contexts which yield to each other through invoking 
 <code>gevent.sleep(0)</code>.</p>
@@ -338,16 +339,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 1 done
+Task 0 done
+Task 2 done
 Task 6 done
 Task 5 done
-Task 0 done
-Task 9 done
-Task 8 done
-Task 7 done
 Task 4 done
+Task 7 done
+Task 8 done
+Task 9 done
+Task 1 done
 Task 3 done
-Task 2 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -506,6 +507,7 @@ I live!
 <p>In addition to using the base Greenlet class, you may also subclass
 Greenlet class and overload the <code>_run</code> method.</p>
 <pre><code class="python">
+import gevent
 from gevent import Greenlet
 
 class MyGreenlet(Greenlet):
@@ -922,11 +924,12 @@ its desired behavior. </p>
 one very simply using a Queue inside of a subclassed Greenlet.</p>
 <pre>
 <code class="python">import gevent
+from gevent.queue import Queue
 
 class Actor(gevent.Greenlet):
 
     def __init__(self):
-        self.inbox = queue.Queue()
+        self.inbox = Queue()
         Greenlet.__init__(self)
 
     def receive(self, message):
@@ -1075,7 +1078,7 @@ Henceforth called <code>wsgi</code> and <code>pywsgi</code>:</p>
 instead of libev. Libevent included a fast HTTP server which was
 used by gevent's <code>wsgi</code> server. </p>
 <p>In gevent 1.0.x there is no http server included. Instead
-<code>gevent.wsgi</code> it is now an alias for the pure Python server in
+<code>gevent.wsgi</code> is now an alias for the pure Python server in
 <code>gevent.pywsgi</code>.</p>
 <h2 id="streaming-servers">Streaming Servers</h2>
 <p><strong>If you are using gevent 1.0.x, this section does not apply</strong></p>
