@@ -829,7 +829,7 @@ instead of libev. Libevent included a fast HTTP server which was
 used by gevent's ``wsgi`` server. 
 
 In gevent 1.0.x there is no http server included. Instead
-``gevent.wsgi`` it is now an alias for the pure Python server in
+``gevent.wsgi`` is now an alias for the pure Python server in
 ``gevent.pywsgi``.
 
 
