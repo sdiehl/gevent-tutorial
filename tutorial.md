@@ -22,6 +22,7 @@ In chronological order of contribution:
 [youngsterxyf](https://github.com/youngsterxyf)
 [Eddie Hebert](https://github.com/ehebert)
 [Alexis Metaireau](http://notmyidea.org)
+[Daniel Velkov](https://github.com/djv)
 
 This is a collaborative document published under MIT license.
 Have something to add? See a typo? Fork and issue a
