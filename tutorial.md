@@ -49,7 +49,7 @@ depend on the other tasks and thus can be run
 *synchronously*. A switch between the two
 executions is known as a *context switch*.
 
-A context switch in gevent done through
+A context switch in gevent is done through
 *yielding*. In this case example we have
 two contexts which yield to each other through invoking 
 ``gevent.sleep(0)``.
@@ -317,6 +317,7 @@ In addition to using the base Greenlet class, you may also subclass
 Greenlet class and overload the ``_run`` method.
 
 [[[cog
+import gevent
 from gevent import Greenlet
 
 class MyGreenlet(Greenlet):
