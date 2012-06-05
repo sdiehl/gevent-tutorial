@@ -686,11 +686,13 @@ one very simply using a Queue inside of a subclassed Greenlet.
 
 <pre>
 <code class="python">import gevent
+from gevent.queue import Queue
+
 
 class Actor(gevent.Greenlet):
 
     def __init__(self):
-        self.inbox = queue.Queue()
+        self.inbox = Queue()
         Greenlet.__init__(self)
 
     def receive(self, message):
