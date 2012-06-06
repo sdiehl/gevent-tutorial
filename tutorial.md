@@ -934,13 +934,15 @@ def ajax_endpoint(environ, start_response):
         ('Content-Type', 'application/json')
     ]
 
-    try:
-        datum = data_source.get(timeout=5)
-    except Empty:
-        datum = []
-
     start_response(status, headers)
-    return json.dumps(datum)
+
+    while True:
+        try:
+            datum = data_source.get(timeout=5)
+            yield json.dumps(datum) + '\n'
+        except Empty:
+            pass
+
 
 gevent.spawn(producer)
 
