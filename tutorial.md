@@ -36,23 +36,24 @@ Any and all contributions are welcome.
 The primary pattern used in gevent is the <strong>Greenlet</strong>, a
 lightweight coroutine provided to Python as a C extension module.
 Greenlets all run inside of the OS process for the main
-program but are scheduled cooperatively. This differs from any of
-the real parallelism constructs provided by ``multiprocessing`` or
-``multithreading`` libraries which do spin processes and POSIX threads
-which are truly parallel.
+program but are scheduled cooperatively. 
+
+> Only one greenlet is ever running at any given time.
+
+This differs from any of the real parallelism constructs provided by
+``multiprocessing`` or ``threading`` libraries which do spin processes
+and POSIX threads which are scheduled by the operating system and
+are truly parallel.
 
 ## Synchronous & Asynchronous Execution
 
-The core idea of concurrency is that a larger task can be broken
-down into a collection of subtasks whose operation does not
-depend on the other tasks and thus can be run 
-*asynchronously* instead of one at a time 
-*synchronously*. A switch between the two
-executions is known as a *context switch*.
+The core idea of concurrency is that a larger task can be broken down
+into a collection of subtasks whose and scheduled to run simultaneously
+or *asynchronously*, instead of one at a time or *synchronously*. A
+switch between the two subtasks is known as a *context switch*.
 
-A context switch in gevent is done through
-*yielding*. In this case example we have
-two contexts which yield to each other through invoking 
+A context switch in gevent is done through *yielding*. In this case
+example we have two contexts which yield to each other through invoking
 ``gevent.sleep(0)``.
 
 [[[cog
@@ -87,6 +88,9 @@ libraries will implicitly yield their greenlet contexts whenever
 possible. I cannot stress enough what a powerful idiom this is.
 But maybe an example will illustrate.
 
+In this case the ``select()`` function is normally a blocking
+call that polls on various file descriptors.
+
 [[[cog
 import time
 import gevent
@@ -119,7 +123,7 @@ gevent.joinall([
 ]]]
 [[[end]]]
 
-A somewhat synthetic example defines a ``task`` function
+Another somewhat synthetic example defines a ``task`` function
 which is *non-deterministic*
 (i.e. its output is not guaranteed to give the same result for
 the same inputs). In this case the side effect of running the
@@ -215,10 +219,10 @@ asynchronous()
 
 ## Determinism
 
-As mentioned previously, greenlets are deterministic. Given the
-same inputs and they always produce the same output. For example
-lets spread a task across a multiprocessing pool compared to a
-gevent pool.
+As mentioned previously, greenlets are deterministic. Given the same
+configuration of greenlets and the same set of inputs and they always
+produce the same output. For example lets spread a task across a
+multiprocessing pool compared to a gevent pool.
 
 <pre>
 <code class="python">
@@ -667,11 +671,162 @@ gevent.joinall([
 
 ## Groups and Pools
 
+A group is a collection of running greenlets which are managed
+and scheduled together as group. It also doubles as parallel
+dispatcher that mirrors the Python ``multiprocessing`` library.
+
+[[[cog
+import gevent
+from gevent.pool import Group
+
+def talk(msg):
+    for i in xrange(3):
+        print(msg)
+
+g1 = gevent.spawn(talk, 'bar')
+g2 = gevent.spawn(talk, 'foo')
+g3 = gevent.spawn(talk, 'fizz')
+
+group = Group()
+group.add(g1)
+group.add(g2)
+group.join()
+
+group.add(g3)
+group.join()
+]]]
+[[[end]]]
+
+This is very usefull for managing groups of asynchronous tasks
+that.
+
+As mentioned above Group also provides an API for dispatching
+jobs to grouped greenlets and collecting their results in various
+ways.
+
+[[[cog
+import gevent
+from gevent import getcurrent
+from gevent.pool import Group
+
+group = Group()
+
+def hello_from(n):
+    print('Size of group', len(group))
+    print('Hello from Greenlet %s' % id(getcurrent()))
+
+group.map(hello_from, xrange(3))
+
+
+def intensive(n):
+    gevent.sleep(3 - n)
+    return 'task', n
+
+print('Ordered')
+
+ogroup = Group()
+for i in ogroup.imap(intensive, xrange(3)):
+    print(i)
+
+print('Unordered')
+
+igroup = Group()
+for i in igroup.imap_unordered(intensive, xrange(3)):
+    print(i)
+
+]]]
+[[[end]]]
+
+A pool is a structure designed for handling dynamic numbers of
+greenlets which need to be concurrency-limited.  This is often
+desirable in cases where one wants to do many network or IO bound
+tasks in parallel.
+
+[[[cog
+import gevent
+from gevent import getcurrent
+from gevent.pool import Pool
+
+pool = Pool(2)
+
+def hello_from(n):
+    print('Size of pool', len(pool))
+
+pool.map(hello_from, xrange(3))
+]]]
+[[[end]]]
+
+Often when building gevent driven services one will center the
+entire service around a pool structure. An example might be a
+class which polls on various sockets.
+
+<pre>
+<code class="python">from gevent.pool import Pool
+
+class SocketPool(object):
+
+    def __init__(self):
+        self.pool = Pool(1000)
+        self.pool.start()
+
+    def listen(self, socket):
+        while True:
+            socket.recv()
+
+    def add_handler(self, socket):
+        if self.pool.full():
+            raise Exception("At maximum pool size")
+        else:
+            self.pool.spawn(self.listen, socket)
+
+    def shutdown(self):
+        self.pool.kill()
+
+</code>
+</pre>
+
 ## Locks and Semaphores
 
-## Thread Locals
+A semaphore is a low level synchronization primitive that allows
+greenlets to coordinate and limit concurrent access or execution. A
+semaphore exposes two methods, ``acquire`` and ``release`` The
+difference between the number of times and a semaphore has been
+acquired and released is called the bound of the semaphore. If a
+semaphore bound reaches 0 it will block until another greenlet
+releases its acquisition.
 
-### Werkzeug
+[[[cog
+from gevent import sleep
+from gevent.pool import Pool
+from gevent.coros import BoundedSemaphore
+
+sem = BoundedSemaphore(2)
+
+def worker1(n):
+    sem.acquire()
+    print('Worker %i acquired semaphore' % n)
+    sleep(0)
+    sem.release()
+    print('Worker %i released semaphore' % n)
+
+def worker2(n):
+    with sem:
+        print('Worker %i acquired semaphore' % n)
+        sleep(0)
+    print('Worker %i released semaphore' % n)
+
+pool = Pool()
+pool.map(worker1, xrange(0,2))
+pool.map(worker2, xrange(3,6))
+]]]
+[[[end]]]
+
+A semaphore with bound of 1 is known as a Lock. it provides
+exclusive execution to one greenlet. They are often used to
+ensure that resources are only in use at one time in the context
+of a program.
+
+## Thread Locals
 
 ## Actors
 
