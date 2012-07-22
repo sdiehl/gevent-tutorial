@@ -351,7 +351,7 @@ Task 0 done
 Task 2 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
-which results in the main programming <em>blocking</em> (
+which results in the main program <em>blocking</em> (
 i.e. pausing the execution of the main program )
 while each task executes.</p>
 <p>The important parts of the program are the
@@ -409,7 +409,7 @@ asynchronous()
 <h2 id="determinism">Determinism</h2>
 <p>As mentioned previously, greenlets are deterministic. Given the same
 configuration of greenlets and the same set of inputs and they always
-produce the same output. For example lets spread a task across a
+produce the same output. For example let's spread a task across a
 multiprocessing pool compared to a gevent pool.</p>
 <pre>
 <code class="python">
@@ -734,7 +734,7 @@ gevent.joinall([
 </code>
 </pre>
 
-<p>A extension of the Event object is the AsyncResult which
+<p>An extension of the Event object is the AsyncResult which
 allows you to send a value along with the wakeup call. This is
 sometimes called a future or a deferred, since it holds a 
 reference to a future value that can be set on an arbitrary time
@@ -835,7 +835,7 @@ Quitting time!
 counterpart, <code>put_nowait</code> and 
 <code>get_nowait</code> which will not block, but instead raise
 either <code>gevent.queue.Empty</code> or
-<code>gevent.queue.Full</code> in the operation is not possible.</p>
+<code>gevent.queue.Full</code> if the operation is not possible.</p>
 <p>In this example we have the boss running simultaneously to the
 workers and have a restriction on the Queue that it can contain no
 more than three elements. This restriction means that the <code>put</code>
@@ -911,7 +911,7 @@ Quitting time!
 </pre></code></p>
 <h2 id="groups-and-pools">Groups and Pools</h2>
 <p>A group is a collection of running greenlets which are managed
-and scheduled together as group. It also doubles as parallel
+and scheduled together as group. It also doubles as a parallel
 dispatcher that mirrors the Python <code>multiprocessing</code> library.</p>
 <pre><code class="python">
 import gevent
@@ -946,9 +946,9 @@ fizz
 fizz
 fizz
 </pre></code></p>
-<p>This is very usefull for managing groups of asynchronous tasks
-that.</p>
-<p>As mentioned above Group also provides an API for dispatching
+<p>This is very useful for managing groups of asynchronous tasks
+that run in parallel.</p>
+<p>As mentioned above, Group also provides an API for dispatching
 jobs to grouped greenlets and collecting their results in various
 ways.</p>
 <pre><code class="python">
@@ -1053,8 +1053,8 @@ class SocketPool(object):
 <h2 id="locks-and-semaphores">Locks and Semaphores</h2>
 <p>A semaphore is a low level synchronization primitive that allows
 greenlets to coordinate and limit concurrent access or execution. A
-semaphore exposes two methods, <code>acquire</code> and <code>release</code> The
-difference between the number of times and a semaphore has been
+semaphore exposes two methods, <code>acquire</code> and <code>release</code>.
+The difference between the number of times and a semaphore has been
 acquired and released is called the bound of the semaphore. If a
 semaphore bound reaches 0 it will block until another greenlet
 releases its acquisition.</p>
@@ -1096,7 +1096,7 @@ Worker 4 released semaphore
 Worker 5 acquired semaphore
 Worker 5 released semaphore
 </pre></code></p>
-<p>A semaphore with bound of 1 is known as a Lock. it provides
+<p>A semaphore with bound of 1 is known as a Lock. It provides
 exclusive execution to one greenlet. They are often used to
 ensure that resources are only in use at one time in the context
 of a program.</p>
@@ -1173,7 +1173,7 @@ very powerful messaging layer for building concurrent and
 distributed applications. </p>
 <p>ZeroMQ provides a variety of socket primitives, the simplest of
 which being a Request-Response socket pair. A socket has two
-methods of interest <code>send</code> and <code>recv</code>, both of which are
+methods of interest: <code>send</code> and <code>recv</code>, both of which are
 normally blocking operations. But this is remedied by a briliant
 library by <a href="https://github.com/traviscline">Travis Cline</a> which
 uses gevent.socket to poll ZeroMQ sockets in a non-blocking
