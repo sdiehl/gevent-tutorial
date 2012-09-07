@@ -452,7 +452,7 @@ except Timeout:
 </code>
 </pre>
 
-Or with a context manager in a ``with`` a statement.
+Or with a context manager in a ``with`` statement.
 
 <pre>
 <code class="python">import gevent
