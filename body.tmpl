@@ -2,95 +2,25 @@
 <html>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <script src="highlight.min.js"></script>
-    <link rel="stylesheet" href="github.min.css">
-    <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Droid+Serif:400,400italic|Inconsolata' rel='stylesheet'>
-
     <script src="jquery.js"></script>
-    <script src="garden.js"></script>
+    <script src="highlight.min.js"></script>
+    <script src="nav.js"></script>
+
+    <!-- Code Monospace Font -->
+    <link href='http://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet'>
 
     <link rel="stylesheet" href="base.css">
     <link rel="stylesheet" href="skeleton.css">
     <link rel="stylesheet" href="layout.css">
+    <link rel="stylesheet" href="gevent.css">
+
+    <!-- Syntax Highlighting Theme -->
+    <link rel="stylesheet" href="github.min.css">
 
     <title>Gevent Tutorial</title>
 </head>
 <style>
 
-    @media only screen and (min-width: 767px) {
-        #sidebar {
-            margin-top: 50px;
-            position: fixed;
-        }
-    }
-
-    @media only screen and (max-width: 767px) {
-        #sidebar {
-            display: none;
-        }
-    }
-
-    .toc {
-        height: 100%;
-    }
-
-    .toc ul {
-        list-style-type: none;
-    }
-
-    a {
-        color: inherit;
-    }
-
-    pre {
-        font: 15px/19px Inconsolata,"Lucida Console",Terminal,"Courier New",Courier;
-
-        margin-top: 30px;
-        margin-bottom: 30px;
-        padding-left: 20px;
-        border-left: 1px solid #CCC;
-    }
-
-    pre code {
-        background: none;
-    }
-
-    p code {
-        font: 15px/19px Inconsolata,"Lucida Console",Terminal,"Courier New",Courier;
-    }
-
-    .label { 
-        display: block;
-        margin-bottom: 0px;
-        padding: 0px;
-        font-family: sans;
-        font-weight: bold;
-        width: 200px;
-        padding: 0.5em;
-    }
-
-    .author {
-        text-align: center;
-    }
-
-    h1 {
-        text-align: center;
-        padding-bottom: 5px;
-        margin-top: 50px;
-        margin-bottom: 50px;
-    }
-
-    h2 {
-        padding-bottom: 10px;
-    }
-
-    .green {
-        color: #7c9a5e;
-    }
-
-    .active {
-        font-weight: bold; 
-    }
 </style>
 <body>
 <div class="container">

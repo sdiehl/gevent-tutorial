@@ -24,10 +24,15 @@ In chronological order of contribution:
 [Alexis Metaireau](http://notmyidea.org)
 [Daniel Velkov](https://github.com/djv)
 
+Also thanks to Denis Bilenko for writing gevent and guidance in
+constructing this tutorial.
+
 This is a collaborative document published under MIT license.
 Have something to add? See a typo? Fork and issue a
 pull request [Github](https://github.com/sdiehl/gevent-tutorial).
 Any and all contributions are welcome.
+
+This page is also [available in Japanese](http://methane.github.com/gevent-tutorial-ja).
 
 # Core
 
@@ -283,7 +288,7 @@ The best approach to this is to simply avoid all global state all
 times. Global state and import-time side effects will always come
 back to bite you!
 
-## Spawning Threads
+## Spawning Greenlets
 
 gevent provides a few wrappers around Greenlet initialization.
 Some of the most common patterns are:
