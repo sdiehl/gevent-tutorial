@@ -277,7 +277,7 @@ modify this value. This results in resources whose values become
 time-dependent on the execution order. This is a problem, and in
 general one should very much try to avoid race conditions since
 they result program behavior which is globally
-non-deterministic.*
+non-deterministic.
 
 The best approach to this is to simply avoid all global state all
 times. Global state and import-time side effects will always come
@@ -319,7 +319,7 @@ gevent.joinall(threads)
 [[[end]]]
 
 In addition to using the base Greenlet class, you may also subclass
-Greenlet class and overload the ``_run`` method.
+Greenlet class and override the ``_run`` method.
 
 [[[cog
 import gevent
