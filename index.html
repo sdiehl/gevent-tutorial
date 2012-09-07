@@ -5,67 +5,37 @@
     <script src="highlight.min.js"></script>
     <link rel="stylesheet" href="github.min.css">
     <link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700|Droid+Serif:400,400italic|Inconsolata' rel='stylesheet'>
-    <script>hljs.initHighlightingOnLoad();</script>
+
+    <script src="jquery.js"></script>
+    <script src="garden.js"></script>
+
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="skeleton.css">
+    <link rel="stylesheet" href="layout.css">
+
     <title>Gevent Tutorial</title>
 </head>
 <style>
-    body {
-        font: 13px/20px "Droid Sans",Arial,"Helvetica Neue","Lucida Grande",sans-serif;
 
-        color: #4C4C4C;
-        background-color: #c9dbb2;
-        margin-left: 0px;
-        margin-top: 5px;
+    @media only screen and (min-width: 767px) {
+        #sidebar {
+            margin-top: 50px;
+            position: fixed;
+        }
+    }
+
+    @media only screen and (max-width: 767px) {
+        #sidebar {
+            display: none;
+        }
     }
 
     .toc {
-        left: 0px;
-        top: 5px;
-        position: fixed;
-        float: left;
-        width: 150px;
-
-        background-color: #FAFBFC;
-        border: 1px solid #FAFBFC;
-
-        -webkit-border-top-right-radius: 10px;
-        -webkit-border-bottom-right-radius: 10px;
-        -moz-border-radius-topright: 10px;
-        -moz-border-radius-bottomright: 10px;
-
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
-
-        padding-left: 5px;
         height: 100%;
     }
 
     .toc ul {
-        margin: 0px;
-        padding: 0px;
         list-style-type: none;
-    }
-
-    .toc ul ul {
-        font-size: 80%;
-        padding-left: 5px;
-    }
-
-    #content {
-        max-width: 960px;
-        margin-left: 160px;
-        padding: 10px;
-        border: 1px solid #FAFBFC;
-
-        background-color: #FAFBFC;
-
-        -webkit-border-radius: 10px;
-        -moz-border-radius: 10px;
-        border-radius: 10px;
-       
-        -webkit-box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.5);
-        -moz-box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.5);
-        box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.5);
     }
 
     a {
@@ -73,20 +43,20 @@
     }
 
     pre {
-        border: 1px solid #ccc;
-        background-color: ghostWhite;
         font: 15px/19px Inconsolata,"Lucida Console",Terminal,"Courier New",Courier;
 
-        -webkit-border-radius: 10px;
-        -moz-border-radius: 10px;
-        border-radius: 10px;
-        padding: 5px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+        padding-left: 20px;
+        border-left: 1px solid #CCC;
+    }
+
+    pre code {
+        background: none;
     }
 
     p code {
-        font-family: monospace;
-        border-bottom: 1px dashed #ccc;
-
+        font: 15px/19px Inconsolata,"Lucida Console",Terminal,"Courier New",Courier;
     }
 
     .label { 
@@ -103,15 +73,11 @@
         text-align: center;
     }
 
-    .email {
-        text-align: center;
-        font-size: 10pt;
-    }
-
-
     h1 {
         text-align: center;
         padding-bottom: 5px;
+        margin-top: 50px;
+        margin-bottom: 50px;
     }
 
     h2 {
@@ -121,22 +87,33 @@
     .green {
         color: #7c9a5e;
     }
+
+    .active {
+        font-weight: bold; 
+    }
 </style>
 <body>
-<div id="content">
+<div class="container">
 
-<header>
-    <h1><span class="green">gevent</span> For the Working Python Developer</h1>
-    <h3 class="author">
-        Written by the Gevent Community
-    </h3>
-</header>
+<div id="sidebar" class="three columns sidebar">
+    <nav>
+    </nav>
+</div>
 
-<blockquote>
-gevent is a concurrency library based around <a href="http://software.schmorp.de/pkg/libev.html">libev</a>.  It provides a clean API for a variety of concurrency and network related tasks.
-</blockquote>
+<div class="twelve columns offset-by-three content">
 
-<div class="toc">
+    <header>
+        <h1><span class="green">gevent</span> For the Working Python Developer</h1>
+        <h3 class="author">
+            Written by the Gevent Community
+        </h3>
+
+        <blockquote>
+        gevent is a concurrency library based around <a href="http://software.schmorp.de/pkg/libev.html">libev</a>.  It provides a clean API for a variety of concurrency and network related tasks.
+        </blockquote>
+    </header>
+
+    <div class="toc">
 <ul>
 <li><a href="#introduction">Introduction</a><ul>
 <li><a href="#contributors">Contributors</a></li>
@@ -339,15 +316,15 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
+Task 0 done
+Task 5 done
+Task 8 done
+Task 1 done
+Task 3 done
 Task 9 done
 Task 6 done
-Task 3 done
-Task 4 done
-Task 8 done
-Task 5 done
-Task 1 done
 Task 7 done
-Task 0 done
+Task 4 done
 Task 2 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
@@ -985,11 +962,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 140728641091376
+Hello from Greenlet 43717008
 Size of group 3
-Hello from Greenlet 140728641090736
+Hello from Greenlet 43718128
 Size of group 3
-Hello from Greenlet 140728641091696
+Hello from Greenlet 43718928
 Ordered
 ('task', 0)
 ('task', 1)
@@ -1361,13 +1338,14 @@ def ajax_endpoint(environ, start_response):
         ('Content-Type', 'application/json')
     ]
 
-    try:
-        datum = data_source.get(timeout=5)
-    except Empty:
-        datum = []
-
     start_response(status, headers)
-    return json.dumps(datum)
+
+    while True:
+        try:
+            datum = data_source.get(timeout=5)
+            yield json.dumps(datum) + '\n'
+        except Empty:
+            pass
 
 gevent.spawn(producer)
 
@@ -1538,5 +1516,6 @@ if __name__ == "__main__":
 </code>
 </pre>
 </div>
+
 </body>
 </html>
