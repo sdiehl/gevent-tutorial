@@ -833,6 +833,148 @@ of a program.
 
 ## Thread Locals
 
+Gevnet also allows you to specify data which is local the
+greenlet context. Internally this is implemented as a global
+lookup which addresses a private namespace keyed by the
+greenlet's ``getcurrent()`` value.
+
+[[[cog
+import gevent
+from gevent.local import local
+
+stash = local()
+
+def f1():
+    stash.x = 1
+    print(stash.x)
+
+def f2():
+    stash.y = 2
+    print(stash.y)
+
+    try:
+        stash.x
+    except AttributeError:
+        print("x is not local to f2")
+
+g1 = gevent.spawn(f1)
+g2 = gevent.spawn(f2)
+
+gevent.joinall([g1, g2])
+]]]
+[[[end]]]
+
+Many web framework thats integrate with gevent store HTTP session
+objects inside of gevent thread locals. For example using the
+Werkzeug utility library and its proxy object we can create
+Flask style request objects.
+
+<pre>
+<code class="python">from gevent.local import local
+from werkzeug.local import LocalProxy
+from werkzeug.wrappers import Request
+from contextlib import contextmanager
+
+from gevent.wsgi import WSGIServer
+
+_requests = local()
+request = LocalProxy(lambda: _requests.request)
+
+@contextmanager
+def sessionmanager(environ):
+    _requests.request = Request(environ)
+    yield
+    _requests.request = None
+
+def logic():
+    return "Hello " + request.remote_addr
+
+def application(environ, start_response):
+    status = '200 OK'
+
+    with sessionmanager(environ):
+        body = logic()
+
+    headers = [
+        ('Content-Type', 'text/html')
+    ]
+
+    start_response(status, headers)
+    return [body]
+
+WSGIServer(('', 8000), application).serve_forever()
+
+
+<code>
+</pre>
+
+Flask's system is more a bit sophisticated than this example, but the
+idea of using thread locals as local session storage is nontheless the
+same.
+
+## Subprocess
+
+As of Gevent 1.0, support has been added for cooperative waiting
+on subprocess.
+
+<pre>
+<code class="python">import gevent
+from gevent.subprocess import Popen, PIPE
+
+# Uses a green pipe which is cooperative
+sub = Popen(['uname'], stdout=PIPE)
+read_output = gevent.spawn(sub.stdout.read)
+
+output = read_output.join()
+print(output.value)
+<code>
+</pre>
+
+<pre>
+<code class="python">Linux
+<code>
+</pre>
+
+Many people also want to use gevent and multiprocessing together. This
+can be done as most multiprocessing objects expose the underlying file
+descriptors.
+
+[[[cog
+import gevent
+from multiprocessing import Process, Pipe
+from gevent.socket import wait_read, wait_write
+
+# To Process
+a, b = Pipe()
+
+# From Process
+c, d = Pipe()
+
+def relay():
+    for i in xrange(10):
+        msg = b.recv()
+        c.send(msg + " in " + str(i))
+
+def put_msg():
+    for i in xrange(10):
+        wait_write(a.fileno())
+        a.send('hi')
+
+def get_msg():
+    for i in xrange(10):
+        wait_read(d.fileno())
+        print(d.recv())
+
+if __name__ == '__main__':
+    proc = Process(target=relay)
+    proc.start()
+
+    g1 = gevent.spawn(get_msg)
+    g2 = gevent.spawn(put_msg)
+    gevent.joinall([g1, g2], timeout=1)
+]]]
+[[[end]]]
+
 ## Actors
 
 The actor model is a higher level concurrency model popularized
@@ -957,7 +1099,7 @@ gevent.joinall([publisher, client])
 ]]]
 [[[end]]]
 
-## Simple Telnet Servers
+## Simple Servers
 
 <pre>
 <code class="python">
