@@ -57,6 +57,7 @@
 <li><a href="#greenlet-state">Greenlet State</a></li>
 <li><a href="#program-shutdown">Program Shutdown</a></li>
 <li><a href="#timeouts">Timeouts</a></li>
+<li><a href="#monkeypatching">Monkeypatching</a></li>
 </ul>
 </li>
 <li><a href="#data-structures">Data Structures</a><ul>
@@ -250,16 +251,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 1 done
-Task 2 done
-Task 5 done
-Task 7 done
-Task 9 done
-Task 8 done
 Task 0 done
-Task 3 done
+Task 9 done
+Task 1 done
 Task 4 done
 Task 6 done
+Task 5 done
+Task 8 done
+Task 3 done
+Task 2 done
+Task 7 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -612,6 +613,58 @@ Thread 1 timed out
 Thread 2 timed out
 Thread 3 timed out
 </pre></code></p>
+<h2 id="monkeypatching">Monkeypatching</h2>
+<p>Alas we come to dark corners of Gevent. I've avoided mentioning
+monkey patching up until now to try and motivate the powerful
+coroutine patterns but the time has come to discuss the dark arts
+of monkey-patching. If you noticed above we invoked the commnad
+<code>monkey.patch_socket()</code>. This is a purely side-effectful command to
+modify the standard library's socket library</p>
+<pre>
+<code class="python">import socket
+print( socket.socket )
+
+print "After monkey patch"
+from gevent import monkey
+monkey.patch_socket()
+print( socket.socket )
+
+import select
+print select.select
+monkey.patch_select()
+print "After monkey patch"
+print( select.select )
+</code>
+</pre>
+
+<pre>
+<code class="python">class 'socket.socket'
+After monkey patch
+class 'gevent.socket.socket'
+
+After monkey patch
+built-in function select
+function select at 0x1924de8
+</code>
+</pre>
+
+<p>Python's runtime allows for most objects to be modified at runtime
+including modules, classes, and even functions. This is generally an
+astoudingly bad idea since it creates an "implicit side-effect" that is
+most often extremely difficult to debug if problems occur, nevertheless
+in extreme situations where a library needs to alter the fundamental
+behavior of Python itself monkey patches can be used. In this case gevent
+is capable of patching most of the blocking system calls in the standard
+library including those in <code>socket</code>, <code>ssl</code>, <code>threading</code> and
+<code>select</code> modules to instead behave cooperatively.</p>
+<p>For example, the Redis python bindings normally uses regular tcp
+sockets to communicate with the <code>redis-server</code> instance. Simply
+by invoking <code>gevent.monkey.patch_all()</code> we can make the redis
+bindings schedule requests cooperatively and work with the rest
+of our gevent stack.</p>
+<p>This lets us integrate libraries that would not normally work with
+gevent without ever writing a single line of code. While monkey-patching
+is still evil, in this case it is a "usefull evil".</p>
 <h1 id="data-structures">Data Structures</h1>
 <h2 id="events">Events</h2>
 <p>Events are a form of asynchronous communication between
@@ -896,11 +949,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 41900624
+Hello from Greenlet 42121488
 Size of group 3
-Hello from Greenlet 41900944
+Hello from Greenlet 42119248
 Size of group 3
-Hello from Greenlet 41899024
+Hello from Greenlet 42120208
 Ordered
 ('task', 0)
 ('task', 1)
