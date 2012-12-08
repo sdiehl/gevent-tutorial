@@ -32,7 +32,7 @@ pre code {
     background: none !important;
 }
 
-p code {
+p code, li code {
     font: 15px/19px Inconsolata,"Lucida Console",Terminal,"Courier New",Courier;
 }
 
