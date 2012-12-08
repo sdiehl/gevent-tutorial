@@ -53,7 +53,7 @@ are truly parallel.
 ## Synchronous & Asynchronous Execution
 
 The core idea of concurrency is that a larger task can be broken down
-into a collection of subtasks whose and scheduled to run simultaneously
+into a collection of subtasks which are scheduled to run simultaneously
 or *asynchronously*, instead of one at a time or *synchronously*. A
 switch between the two subtasks is known as a *context switch*.
 
