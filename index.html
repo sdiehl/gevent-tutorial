@@ -252,15 +252,15 @@ Task 8 done
 Task 9 done
 Asynchronous:
 Task 0 done
-Task 9 done
-Task 1 done
-Task 4 done
 Task 6 done
-Task 5 done
-Task 8 done
 Task 3 done
-Task 2 done
 Task 7 done
+Task 2 done
+Task 1 done
+Task 8 done
+Task 5 done
+Task 9 done
+Task 4 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -281,9 +281,9 @@ each tasks pauses for 2 seconds resulting in a 20 seconds for the
 whole queue. In the async case the maximum runtime is roughly 2
 seconds since none of the tasks block the execution of the
 others.</p>
-<p>A more common use case, fetching data from a server
-asynchronously, the runtime of <code>fetch()</code> will differ between
-requests given the load on the remote server.</p>
+<p>In a more common use case, asynchronously fetching data from a server,
+the runtime of <code>fetch()</code> will differ between
+requests, depending on the load on the remote server at the time of the request.</p>
 <pre><code class="python">import gevent.monkey
 gevent.monkey.patch_socket()
 
@@ -320,9 +320,9 @@ asynchronous()
 
 <h2 id="determinism">Determinism</h2>
 <p>As mentioned previously, greenlets are deterministic. Given the same
-configuration of greenlets and the same set of inputs and they always
-produce the same output. For example lets spread a task across a
-multiprocessing pool compared to a gevent pool.</p>
+configuration of greenlets and the same set of inputs, they always
+produce the same output. For example, let's spread a task across a
+multiprocessing pool and compare its results to the one of a gevent pool.</p>
 <pre>
 <code class="python">
 import time
@@ -369,14 +369,13 @@ even though green threads are a form of "deterministic
 concurrency", they still can experience some of the same problems
 that POSIX threads and processes experience.</p>
 <p>The perennial problem involved with concurrency is known as a
-<em>race condition</em>. Simply put is when two concurrent threads
+<em>race condition</em>. Simply put, a race condition occurs when two concurrent threads
 / processes depend on some shared resource but also attempt to
-modify this value. This results in resources whose values become
+modify this value. This results in resources which values become
 time-dependent on the execution order. This is a problem, and in
 general one should very much try to avoid race conditions since
-they result program behavior which is globally
-non-deterministic.</p>
-<p>The best approach to this is to simply avoid all global state all
+they result in a globally non-deterministic program behavior.</p>
+<p>The best approach to this is to simply avoid all global state at all
 times. Global state and import-time side effects will always come
 back to bite you!</p>
 <h2 id="spawning-greenlets">Spawning Greenlets</h2>
@@ -445,17 +444,16 @@ Hi there!
 <h2 id="greenlet-state">Greenlet State</h2>
 <p>Like any other segment of code, Greenlets can fail in various
 ways. A greenlet may fail to throw an exception, fail to halt or
-consume too many system resources.</p></p>
+consume too many system resources.</p>
 <p>The internal state of a greenlet is generally a time-dependent
 parameter. There are a number of flags on greenlets which let
-you monitor the state of the thread</p>
-
+you monitor the state of the thread:</p>
 <ul>
-<li><code>started</code> -- Boolean, indicates whether the Greenlet has been started. </li></li>
-<li><code>ready()</code> -- Boolean, indicates whether the Greenlet has halted</li></li>
-<li><code>successful()</code> -- Boolean, indicates whether the Greenlet has halted and not thrown an exception</li></li>
-<li><code>value</code> -- arbitrary, the value returned by the Greenlet</li></li>
-<li><code>exception</code> -- exception, uncaught exception instance thrown inside the greenlet</li></li>
+<li><code>started</code> -- Boolean, indicates whether the Greenlet has been started</li>
+<li><code>ready()</code> -- Boolean, indicates whether the Greenlet has halted</li>
+<li><code>successful()</code> -- Boolean, indicates whether the Greenlet has halted and not thrown an exception</li>
+<li><code>value</code> -- arbitrary, the value returned by the Greenlet</li>
+<li><code>exception</code> -- exception, uncaught exception instance thrown inside the greenlet</li>
 </ul>
 <pre><code class="python">
 import gevent
@@ -556,7 +554,7 @@ except Timeout:
 </code>
 </pre>
 
-<p>Or with a context manager in a <code>with</code> statement.</p>
+<p>They can also be used with a context manager, in a <code>with</code> statement.</p>
 <pre>
 <code class="python">import gevent
 from gevent import Timeout
@@ -642,8 +640,8 @@ print( select.select )
 After monkey patch
 class 'gevent.socket.socket'
 
-After monkey patch
 built-in function select
+After monkey patch
 function select at 0x1924de8
 </code>
 </pre>
@@ -664,7 +662,7 @@ bindings schedule requests cooperatively and work with the rest
 of our gevent stack.</p>
 <p>This lets us integrate libraries that would not normally work with
 gevent without ever writing a single line of code. While monkey-patching
-is still evil, in this case it is a "usefull evil".</p>
+is still evil, in this case it is a "useful evil".</p>
 <h1 id="data-structures">Data Structures</h1>
 <h2 id="events">Events</h2>
 <p>Events are a form of asynchronous communication between
@@ -801,7 +799,7 @@ counterpart, <code>put_nowait</code> and
 either <code>gevent.queue.Empty</code> or
 <code>gevent.queue.Full</code> in the operation is not possible.</p>
 <p>In this example we have the boss running simultaneously to the
-workers and have a restriction on the Queue that it can contain no
+workers and have a restriction on the Queue preventing it from containing
 more than three elements. This restriction means that the <code>put</code>
 operation will block until there is space on the queue.
 Conversely the <code>get</code> operation will block if there are
@@ -910,9 +908,8 @@ fizz
 fizz
 fizz
 </pre></code></p>
-<p>This is very usefull for managing groups of asynchronous tasks
-that.</p>
-<p>As mentioned above Group also provides an API for dispatching
+<p>This is very useful for managing groups of asynchronous tasks.</p>
+<p>As mentioned above, <code>Group</code> also provides an API for dispatching
 jobs to grouped greenlets and collecting their results in various
 ways.</p>
 <pre><code class="python">
@@ -949,11 +946,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 42121488
+Hello from Greenlet 20398800
 Size of group 3
-Hello from Greenlet 42119248
+Hello from Greenlet 20399280
 Size of group 3
-Hello from Greenlet 42120208
+Hello from Greenlet 20400240
 Ordered
 ('task', 0)
 ('task', 1)
@@ -969,7 +966,6 @@ desirable in cases where one wants to do many network or IO bound
 tasks in parallel.</p>
 <pre><code class="python">
 import gevent
-from gevent import getcurrent
 from gevent.pool import Pool
 
 pool = Pool(2)
@@ -1065,8 +1061,8 @@ exclusive execution to one greenlet. They are often used to
 ensure that resources are only in use at one time in the context
 of a program.</p>
 <h2 id="thread-locals">Thread Locals</h2>
-<p>Gevnet also allows you to specify data which is local the
-greenlet context. Internally this is implemented as a global
+<p>Gevent also allows you to specify data which is local to the
+greenlet context. Internally, this is implemented as a global
 lookup which addresses a private namespace keyed by the
 greenlet's <code>getcurrent()</code> value.</p>
 <pre><code class="python">
@@ -1142,8 +1138,8 @@ WSGIServer(('', 8000), application).serve_forever()
 <code>
 </pre>
 
-<p>Flask's system is more a bit sophisticated than this example, but the
-idea of using thread locals as local session storage is nontheless the
+<p>Flask's system is a bit more sophisticated than this example, but the
+idea of using thread locals as local session storage is nonetheless the
 same.</p>
 <h2 id="subprocess">Subprocess</h2>
 <p>As of Gevent 1.0, support has been added for cooperative waiting
