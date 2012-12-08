@@ -184,9 +184,9 @@ whole queue. In the async case the maximum runtime is roughly 2
 seconds since none of the tasks block the execution of the
 others.
 
-A more common use case, fetching data from a server
-asynchronously, the runtime of ``fetch()`` will differ between
-requests given the load on the remote server.
+In a more common use case, asynchronously fetching data from a server,
+the runtime of ``fetch()`` will differ between
+requests, depending on the load on the remote server at the time of the request.
 
 <pre><code class="python">import gevent.monkey
 gevent.monkey.patch_socket()
@@ -225,9 +225,9 @@ asynchronous()
 ## Determinism
 
 As mentioned previously, greenlets are deterministic. Given the same
-configuration of greenlets and the same set of inputs and they always
-produce the same output. For example lets spread a task across a
-multiprocessing pool compared to a gevent pool.
+configuration of greenlets and the same set of inputs, they always
+produce the same output. For example, let's spread a task across a
+multiprocessing pool and compare its results to the one of a gevent pool.
 
 <pre>
 <code class="python">
@@ -276,15 +276,14 @@ concurrency", they still can experience some of the same problems
 that POSIX threads and processes experience.
 
 The perennial problem involved with concurrency is known as a
-*race condition*. Simply put is when two concurrent threads
+*race condition*. Simply put, a race condition occurs when two concurrent threads
 / processes depend on some shared resource but also attempt to
-modify this value. This results in resources whose values become
+modify this value. This results in resources which values become
 time-dependent on the execution order. This is a problem, and in
 general one should very much try to avoid race conditions since
-they result program behavior which is globally
-non-deterministic.
+they result in a globally non-deterministic program behavior.
 
-The best approach to this is to simply avoid all global state all
+The best approach to this is to simply avoid all global state at all
 times. Global state and import-time side effects will always come
 back to bite you!
 
@@ -352,17 +351,17 @@ g.join()
 
 Like any other segment of code, Greenlets can fail in various
 ways. A greenlet may fail to throw an exception, fail to halt or
-consume too many system resources.</p>
+consume too many system resources.
 
-<p>The internal state of a greenlet is generally a time-dependent
+The internal state of a greenlet is generally a time-dependent
 parameter. There are a number of flags on greenlets which let
-you monitor the state of the thread</p>
+you monitor the state of the thread:
 
-- ``started`` -- Boolean, indicates whether the Greenlet has been started. </li>
-- ``ready()`` -- Boolean, indicates whether the Greenlet has halted</li>
-- ``successful()`` -- Boolean, indicates whether the Greenlet has halted and not thrown an exception</li>
-- ``value`` -- arbitrary, the value returned by the Greenlet</li>
-- ``exception`` -- exception, uncaught exception instance thrown inside the greenlet</li>
+- ``started`` -- Boolean, indicates whether the Greenlet has been started
+- ``ready()`` -- Boolean, indicates whether the Greenlet has halted
+- ``successful()`` -- Boolean, indicates whether the Greenlet has halted and not thrown an exception
+- ``value`` -- arbitrary, the value returned by the Greenlet
+- ``exception`` -- exception, uncaught exception instance thrown inside the greenlet
 
 [[[cog
 import gevent
@@ -457,7 +456,7 @@ except Timeout:
 </code>
 </pre>
 
-Or with a context manager in a ``with`` statement.
+They can also be used with a context manager, in a ``with`` statement.
 
 <pre>
 <code class="python">import gevent
@@ -566,7 +565,7 @@ of our gevent stack.
 
 This lets us integrate libraries that would not normally work with
 gevent without ever writing a single line of code. While monkey-patching
-is still evil, in this case it is a "usefull evil".
+is still evil, in this case it is a "useful evil".
 
 # Data Structures
 
@@ -684,7 +683,7 @@ either ``gevent.queue.Empty`` or
 ``gevent.queue.Full`` in the operation is not possible.
 
 In this example we have the boss running simultaneously to the
-workers and have a restriction on the Queue that it can contain no
+workers and have a restriction on the Queue preventing it from containing
 more than three elements. This restriction means that the ``put``
 operation will block until there is space on the queue.
 Conversely the ``get`` operation will block if there are
@@ -759,10 +758,9 @@ group.join()
 ]]]
 [[[end]]]
 
-This is very usefull for managing groups of asynchronous tasks
-that.
+This is very useful for managing groups of asynchronous tasks.
 
-As mentioned above Group also provides an API for dispatching
+As mentioned above, ``Group`` also provides an API for dispatching
 jobs to grouped greenlets and collecting their results in various
 ways.
 
@@ -806,7 +804,6 @@ tasks in parallel.
 
 [[[cog
 import gevent
-from gevent import getcurrent
 from gevent.pool import Pool
 
 pool = Pool(2)
@@ -890,8 +887,8 @@ of a program.
 
 ## Thread Locals
 
-Gevnet also allows you to specify data which is local the
-greenlet context. Internally this is implemented as a global
+Gevent also allows you to specify data which is local to the
+greenlet context. Internally, this is implemented as a global
 lookup which addresses a private namespace keyed by the
 greenlet's ``getcurrent()`` value.
 
@@ -965,8 +962,8 @@ WSGIServer(('', 8000), application).serve_forever()
 <code>
 </pre>
 
-Flask's system is more a bit sophisticated than this example, but the
-idea of using thread locals as local session storage is nontheless the
+Flask's system is a bit more sophisticated than this example, but the
+idea of using thread locals as local session storage is nonetheless the
 same.
 
 ## Subprocess
