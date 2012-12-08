@@ -124,7 +124,7 @@ and POSIX threads which are scheduled by the operating system and
 are truly parallel.</p>
 <h2 id="synchronous-asynchronous-execution">Synchronous &amp; Asynchronous Execution</h2>
 <p>The core idea of concurrency is that a larger task can be broken down
-into a collection of subtasks whose and scheduled to run simultaneously
+into a collection of subtasks which are scheduled to run simultaneously
 or <em>asynchronously</em>, instead of one at a time or <em>synchronously</em>. A
 switch between the two subtasks is known as a <em>context switch</em>.</p>
 <p>A context switch in gevent is done through <em>yielding</em>. In this case
@@ -252,15 +252,15 @@ Task 8 done
 Task 9 done
 Asynchronous:
 Task 0 done
-Task 6 done
-Task 3 done
-Task 7 done
 Task 2 done
+Task 6 done
+Task 7 done
 Task 1 done
-Task 8 done
-Task 5 done
-Task 9 done
 Task 4 done
+Task 3 done
+Task 5 done
+Task 8 done
+Task 9 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -946,11 +946,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 20398800
+Hello from Greenlet 14533328
 Size of group 3
-Hello from Greenlet 20399280
+Hello from Greenlet 14533808
 Size of group 3
-Hello from Greenlet 20400240
+Hello from Greenlet 14534768
 Ordered
 ('task', 0)
 ('task', 1)
