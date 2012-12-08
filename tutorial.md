@@ -351,17 +351,17 @@ g.join()
 
 Like any other segment of code, Greenlets can fail in various
 ways. A greenlet may fail to throw an exception, fail to halt or
-consume too many system resources.</p>
+consume too many system resources.
 
-<p>The internal state of a greenlet is generally a time-dependent
+The internal state of a greenlet is generally a time-dependent
 parameter. There are a number of flags on greenlets which let
-you monitor the state of the thread</p>
+you monitor the state of the thread:
 
-- ``started`` -- Boolean, indicates whether the Greenlet has been started. </li>
-- ``ready()`` -- Boolean, indicates whether the Greenlet has halted</li>
-- ``successful()`` -- Boolean, indicates whether the Greenlet has halted and not thrown an exception</li>
-- ``value`` -- arbitrary, the value returned by the Greenlet</li>
-- ``exception`` -- exception, uncaught exception instance thrown inside the greenlet</li>
+- ``started`` -- Boolean, indicates whether the Greenlet has been started
+- ``ready()`` -- Boolean, indicates whether the Greenlet has halted
+- ``successful()`` -- Boolean, indicates whether the Greenlet has halted and not thrown an exception
+- ``value`` -- arbitrary, the value returned by the Greenlet
+- ``exception`` -- exception, uncaught exception instance thrown inside the greenlet
 
 [[[cog
 import gevent
