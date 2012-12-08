@@ -804,7 +804,6 @@ tasks in parallel.
 
 [[[cog
 import gevent
-from gevent import getcurrent
 from gevent.pool import Pool
 
 pool = Pool(2)
