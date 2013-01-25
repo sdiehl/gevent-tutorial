@@ -968,8 +968,9 @@ same.
 
 ## Subprocess
 
-As of Gevent 1.0, support has been added for cooperative waiting
-on subprocess.
+As of gevent 1.0, ``gevent.subprocess`` -- a patched version of Python's
+``subprocess`` module -- has been added. It supports cooperative waiting on
+subprocesses.
 
 <pre>
 <code class="python">import gevent
@@ -981,19 +982,24 @@ read_output = gevent.spawn(sub.stdout.read)
 
 output = read_output.join()
 print(output.value)
-<code>
+</code>
 </pre>
 
 <pre>
 <code class="python">Linux
-<code>
+</code>
 </pre>
 
-Many people also want to use gevent and multiprocessing together. This
-can be done as most multiprocessing objects expose the underlying file
-descriptors.
+Many people also want to use ``gevent`` and ``multiprocessing`` together. One of
+the most obvious challenges is that inter-process communication provided by
+``multiprocessing`` is not cooperative by default. Since
+``multiprocessing.Connection``-based objects (such as ``Pipe``) expose their
+underlying file descriptors, ``gevent.socket.wait_read`` and ``wait_write`` can
+be used to cooperatively wait for ready-to-read/ready-to-write events before
+actually reading/writing:
 
-[[[cog
+<pre>
+<code class="python">
 import gevent
 from multiprocessing import Process, Pipe
 from gevent.socket import wait_read, wait_write
@@ -1026,8 +1032,29 @@ if __name__ == '__main__':
     g1 = gevent.spawn(get_msg)
     g2 = gevent.spawn(put_msg)
     gevent.joinall([g1, g2], timeout=1)
-]]]
-[[[end]]]
+</code>
+</pre>
+
+Note, however, that the combination of ``multiprocessing`` and gevent brings
+along certain OS-dependent pitfalls, among others:
+
+* After [forking](http://linux.die.net/man/2/fork) on POSIX-compliant systems
+gevent's state in the child is ill-posed. One side effect is that greenlets
+spawned before ``multiprocessing.Process`` creation run in both, parent and
+child process.
+* ``a.send()`` in ``put_msg()`` above might still block the calling thread
+non-cooperatively: a ready-to-write event only ensures that one byte can be
+written. The underlying buffer might be full before the attempted write is
+complete.
+* The ``wait_write()`` / ``wait_read()``-based approach as indicated above does
+not work on Windows (``IOError: 3 is not a socket (files are not supported)``),
+because Windows cannot watch pipes for events.
+
+The Python package [gipc](http://pypi.python.org/pypi/gipc) overcomes these
+challenges for you in a largely transparent fashion on both, POSIX-compliant and
+Windows systems. It provides gevent-aware ``multiprocessing.Process``-based
+child processes and gevent-cooperative inter-process communication based on
+pipes.
 
 ## Actors
 
