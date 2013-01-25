@@ -251,16 +251,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 0 done
-Task 2 done
+Task 8 done
+Task 5 done
 Task 6 done
+Task 3 done
+Task 9 done
+Task 2 done
 Task 7 done
+Task 0 done
 Task 1 done
 Task 4 done
-Task 3 done
-Task 5 done
-Task 8 done
-Task 9 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -946,11 +946,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 14533328
+Hello from Greenlet 22721552
 Size of group 3
-Hello from Greenlet 14533808
+Hello from Greenlet 22722672
 Size of group 3
-Hello from Greenlet 14534768
+Hello from Greenlet 22724432
 Ordered
 ('task', 0)
 ('task', 1)
@@ -1142,8 +1142,9 @@ WSGIServer(('', 8000), application).serve_forever()
 idea of using thread locals as local session storage is nonetheless the
 same.</p>
 <h2 id="subprocess">Subprocess</h2>
-<p>As of Gevent 1.0, support has been added for cooperative waiting
-on subprocess.</p>
+<p>As of gevent 1.0, <code>gevent.subprocess</code> -- a patched version of Python's
+<code>subprocess</code> module -- has been added. It supports cooperative waiting on
+subprocesses.</p>
 <pre>
 <code class="python">import gevent
 from gevent.subprocess import Popen, PIPE
@@ -1154,18 +1155,23 @@ read_output = gevent.spawn(sub.stdout.read)
 
 output = read_output.join()
 print(output.value)
-<code>
+</code>
 </pre>
 
 <pre>
 <code class="python">Linux
-<code>
+</code>
 </pre>
 
-<p>Many people also want to use gevent and multiprocessing together. This
-can be done as most multiprocessing objects expose the underlying file
-descriptors.</p>
-<pre><code class="python">
+<p>Many people also want to use <code>gevent</code> and <code>multiprocessing</code> together. One of
+the most obvious challenges is that inter-process communication provided by
+<code>multiprocessing</code> is not cooperative by default. Since
+<code>multiprocessing.Connection</code>-based objects (such as <code>Pipe</code>) expose their
+underlying file descriptors, <code>gevent.socket.wait_read</code> and <code>wait_write</code> can
+be used to cooperatively wait for ready-to-read/ready-to-write events before
+actually reading/writing:</p>
+<pre>
+<code class="python">
 import gevent
 from multiprocessing import Process, Pipe
 from gevent.socket import wait_read, wait_write
@@ -1198,11 +1204,29 @@ if __name__ == '__main__':
     g1 = gevent.spawn(get_msg)
     g2 = gevent.spawn(put_msg)
     gevent.joinall([g1, g2], timeout=1)
+</code>
 </pre>
 
-<p></code>
-<pre><code class="python">
-</pre></code></p>
+<p>Note, however, that the combination of <code>multiprocessing</code> and gevent brings
+along certain OS-dependent pitfalls, among others:</p>
+<ul>
+<li>After <a href="http://linux.die.net/man/2/fork">forking</a> on POSIX-compliant systems
+gevent's state in the child is ill-posed. One side effect is that greenlets
+spawned before <code>multiprocessing.Process</code> creation run in both, parent and
+child process.</li>
+<li><code>a.send()</code> in <code>put_msg()</code> above might still block the calling thread
+non-cooperatively: a ready-to-write event only ensures that one byte can be
+written. The underlying buffer might be full before the attempted write is
+complete.</li>
+<li>The <code>wait_write()</code> / <code>wait_read()</code>-based approach as indicated above does
+not work on Windows (<code>IOError: 3 is not a socket (files are not supported)</code>),
+because Windows cannot watch pipes for events.</li>
+</ul>
+<p>The Python package <a href="http://pypi.python.org/pypi/gipc">gipc</a> overcomes these
+challenges for you in a largely transparent fashion on both, POSIX-compliant and
+Windows systems. It provides gevent-aware <code>multiprocessing.Process</code>-based
+child processes and gevent-cooperative inter-process communication based on
+pipes.</p>
 <h2 id="actors">Actors</h2>
 <p>The actor model is a higher level concurrency model popularized
 by the language Erlang. In short the main idea is that you have a
