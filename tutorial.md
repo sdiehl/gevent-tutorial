@@ -973,21 +973,31 @@ As of gevent 1.0, ``gevent.subprocess`` -- a patched version of Python's
 subprocesses.
 
 <pre>
-<code class="python">import gevent
+<code class="python">
+import gevent
 from gevent.subprocess import Popen, PIPE
 
-# Uses a green pipe which is cooperative
-sub = Popen(['uname'], stdout=PIPE)
-read_output = gevent.spawn(sub.stdout.read)
+def cron():
+    while True:
+        print "cron"
+        gevent.sleep(0.2)
 
-output = read_output.join()
-print(output.value)
-</code>
+g = gevent.spawn(cron)
+sub = Popen(['sleep 1; uname'], stdout=PIPE, shell=True)
+out, err = sub.communicate()
+g.kill()
+print out.rstrip()
 </pre>
 
 <pre>
-<code class="python">Linux
-</code>
+<code class="python">
+cron
+cron
+cron
+cron
+cron
+Linux
+<code>
 </pre>
 
 Many people also want to use ``gevent`` and ``multiprocessing`` together. One of
