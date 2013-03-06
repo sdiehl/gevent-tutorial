@@ -514,10 +514,10 @@ except Timeout:
 
 Alas we come to dark corners of Gevent. I've avoided mentioning
 monkey patching up until now to try and motivate the powerful
-coroutine patterns but the time has come to discuss the dark arts
-of monkey-patching. If you noticed above we invoked the commnad
+coroutine patterns, but the time has come to discuss the dark arts
+of monkey-patching. If you noticed above we invoked the command
 ``monkey.patch_socket()``. This is a purely side-effectful command to
-modify the standard library's socket library
+modify the standard library's socket library.
 
 <pre>
 <code class="python">import socket
