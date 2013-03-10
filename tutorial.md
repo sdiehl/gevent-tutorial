@@ -308,7 +308,7 @@ def foo(message, n):
 # foo
 thread1 = Greenlet.spawn(foo, "Hello", 1)
 
-# Wrapper for creating and runing a new Greenlet from the named 
+# Wrapper for creating and running a new Greenlet from the named 
 # function foo, with the passed arguments
 thread2 = gevent.spawn(foo, "I live!", 2)
 
