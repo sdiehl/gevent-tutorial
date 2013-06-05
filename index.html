@@ -90,7 +90,7 @@ the tools you need to get going with gevent, help you tame
 your existing concurrency problems and start writing asynchronous
 applications today.</p>
 <h3 id="contributors">Contributors</h3>
-<p>In chronological order of contribution: 
+<p>In chronological order of contribution:
 <a href="http://www.stephendiehl.com">Stephen Diehl</a>
 <a href="https://github.com/jerem">J&eacute;r&eacute;my Bethmont</a>
 <a href="https://github.com/sww">sww</a>
@@ -268,7 +268,7 @@ i.e. pausing the execution of the main program )
 while each task executes.</p>
 <p>The important parts of the program are the
 <code>gevent.spawn</code> which wraps up the given function
-inside of a Greenlet thread. The list of initialized greenlets 
+inside of a Greenlet thread. The list of initialized greenlets
 are stored in the array <code>threads</code> which is passed to
 the <code>gevent.joinall</code> function which blocks the current
 program to run all the given greenlets. The execution will step
@@ -397,7 +397,7 @@ def foo(message, n):
 # foo
 thread1 = Greenlet.spawn(foo, "Hello", 1)
 
-# Wrapper for creating and runing a new Greenlet from the named 
+# Wrapper for creating and runing a new Greenlet from the named
 # function foo, with the passed arguments
 thread2 = gevent.spawn(foo, "I live!", 2)
 
@@ -698,7 +698,7 @@ gevent.joinall([
 
 <p>A extension of the Event object is the AsyncResult which
 allows you to send a value along with the wakeup call. This is
-sometimes called a future or a deferred, since it holds a 
+sometimes called a future or a deferred, since it holds a
 reference to a future value that can be set on an arbitrary time
 schedule.</p>
 <pre>
@@ -794,11 +794,11 @@ Quitting time!
 </pre></code></p>
 <p>Queues can also block on either <code>put</code> or <code>get</code> as the need arises. </p>
 <p>Each of the <code>put</code> and <code>get</code> operations has a non-blocking
-counterpart, <code>put_nowait</code> and 
+counterpart, <code>put_nowait</code> and
 <code>get_nowait</code> which will not block, but instead raise
 either <code>gevent.queue.Empty</code> or
-<code>gevent.queue.Full</code> in the operation is not possible.</p>
-<p>In this example we have the boss running simultaneously to the
+<code>gevent.queue.Full</code> if the operation is not possible.</p>
+<p>In the example below we have the boss running simultaneously to the
 workers and have a restriction on the Queue preventing it from containing
 more than three elements. This restriction means that the <code>put</code>
 operation will block until there is space on the queue.
@@ -1375,7 +1375,7 @@ Switched to Client for  9
 <h2 id="simple-servers">Simple Servers</h2>
 <pre>
 <code class="python">
-# On Unix: Access with ``$ nc 127.0.0.1 5000`` 
+# On Unix: Access with ``$ nc 127.0.0.1 5000``
 # On Window: Access with ``$ telnet 127.0.0.1 5000``
 
 from gevent.server import StreamServer
@@ -1469,8 +1469,8 @@ WSGIServer(('', 8000), application).serve_forever()
 <p>But regardless, performance on Gevent servers is phenomenal
 compared to other Python servers. libev is a very vetted technology
 and its derivative servers are known to perform well at scale.</p>
-<p>To benchmark, try Apache Benchmark <code>ab</code> or see this 
-<a href="http://nichol.as/benchmark-of-python-web-servers">Benchmark of Python WSGI Servers</a> 
+<p>To benchmark, try Apache Benchmark <code>ab</code> or see this
+<a href="http://nichol.as/benchmark-of-python-web-servers">Benchmark of Python WSGI Servers</a>
 for comparison with other servers.</p>
 <pre>
 <code class="shell">$ ab -n 10000 -c 100 http://127.0.0.1:8000/
