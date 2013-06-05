@@ -797,8 +797,8 @@ Quitting time!
 counterpart, <code>put_nowait</code> and
 <code>get_nowait</code> which will not block, but instead raise
 either <code>gevent.queue.Empty</code> or
-<code>gevent.queue.Full</code> in the operation is not possible.</p>
-<p>In this example we have the boss running simultaneously to the
+<code>gevent.queue.Full</code> if the operation is not possible.</p>
+<p>In the example below we have the boss running simultaneously to the
 workers and have a restriction on the Queue preventing it from containing
 more than three elements. This restriction means that the <code>put</code>
 operation will block until there is space on the queue.
