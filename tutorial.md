@@ -117,7 +117,7 @@ def gr2():
     print('Ended Polling: ', tic())
 
 def gr3():
-    print("Hey lets do some stuff while the greenlets poll, at", tic())
+    print("Hey lets do some stuff while the greenlets poll, ", tic())
     gevent.sleep(1)
 
 gevent.joinall([
