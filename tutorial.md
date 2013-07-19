@@ -11,7 +11,7 @@ applications today.
 
 ### Contributors
 
-In chronological order of contribution: 
+In chronological order of contribution:
 [Stephen Diehl](http://www.stephendiehl.com)
 [J&eacute;r&eacute;my Bethmont](https://github.com/jerem)
 [sww](https://github.com/sww)
@@ -41,7 +41,7 @@ This page is also [available in Japanese](http://methane.github.com/gevent-tutor
 The primary pattern used in gevent is the <strong>Greenlet</strong>, a
 lightweight coroutine provided to Python as a C extension module.
 Greenlets all run inside of the OS process for the main
-program but are scheduled cooperatively. 
+program but are scheduled cooperatively.
 
 > Only one greenlet is ever running at any given time.
 
@@ -169,7 +169,7 @@ while each task executes.
 
 The important parts of the program are the
 ``gevent.spawn`` which wraps up the given function
-inside of a Greenlet thread. The list of initialized greenlets 
+inside of a Greenlet thread. The list of initialized greenlets
 are stored in the array ``threads`` which is passed to
 the ``gevent.joinall`` function which blocks the current
 program to run all the given greenlets. The execution will step
@@ -308,7 +308,7 @@ def foo(message, n):
 # foo
 thread1 = Greenlet.spawn(foo, "Hello", 1)
 
-# Wrapper for creating and running a new Greenlet from the named 
+# Wrapper for creating and running a new Greenlet from the named
 # function foo, with the passed arguments
 thread2 = gevent.spawn(foo, "I live!", 2)
 
@@ -591,14 +591,14 @@ def setter():
 	gevent.sleep(3)
 	print("Ok, I'm done")
 	evt.set()
-	
-	
+
+
 def waiter():
 	'''After 3 seconds the get call will unblock'''
 	print("I'll wait for you")
 	evt.wait()  # blocking
 	print("It's about time")
-	
+
 def main():
 	gevent.joinall([
 		gevent.spawn(setter),
@@ -616,7 +616,7 @@ if __name__ == '__main__': main()
 
 A extension of the Event object is the AsyncResult which
 allows you to send a value along with the wakeup call. This is
-sometimes called a future or a deferred, since it holds a 
+sometimes called a future or a deferred, since it holds a
 reference to a future value that can be set on an arbitrary time
 schedule.
 
@@ -685,10 +685,10 @@ gevent.joinall([
 ]]]
 [[[end]]]
 
-Queues can also block on either ``put`` or ``get`` as the need arises. 
+Queues can also block on either ``put`` or ``get`` as the need arises.
 
 Each of the ``put`` and ``get`` operations has a non-blocking
-counterpart, ``put_nowait`` and 
+counterpart, ``put_nowait`` and
 ``get_nowait`` which will not block, but instead raise
 either ``gevent.queue.Empty`` or
 ``gevent.queue.Full`` in the operation is not possible.
@@ -1084,7 +1084,7 @@ by the language Erlang. In short the main idea is that you have a
 collection of independent Actors which have an inbox from which
 they receive messages from other Actors. The main loop inside the
 Actor iterates through its messages and takes action according to
-its desired behavior. 
+its desired behavior.
 
 Gevent does not have a primitive Actor type, but we can define
 one very simply using a Queue inside of a subclassed Greenlet.
@@ -1153,7 +1153,7 @@ gevent.joinall([ping, pong])
 [ZeroMQ](http://www.zeromq.org/) is described by its authors as
 "a socket library that acts as a concurrency framework". It is a
 very powerful messaging layer for building concurrent and
-distributed applications. 
+distributed applications.
 
 ZeroMQ provides a variety of socket primitives, the simplest of
 which being a Request-Response socket pair. A socket has two
@@ -1205,8 +1205,8 @@ gevent.joinall([publisher, client])
 
 <pre>
 <code class="python">
-# On Unix: Access with ``$ nc 127.0.0.1 5000`` 
-# On Window: Access with ``$ telnet 127.0.0.1 5000`` 
+# On Unix: Access with ``$ nc 127.0.0.1 5000``
+# On Window: Access with ``$ telnet 127.0.0.1 5000``
 
 from gevent.server import StreamServer
 
@@ -1231,7 +1231,7 @@ Henceforth called ``wsgi`` and ``pywsgi``:
 
 In earlier versions of gevent before 1.0.x, gevent used libevent
 instead of libev. Libevent included a fast HTTP server which was
-used by gevent's ``wsgi`` server. 
+used by gevent's ``wsgi`` server.
 
 In gevent 1.0.x there is no http server included. Instead
 ``gevent.wsgi`` is now an alias for the pure Python server in
@@ -1281,7 +1281,7 @@ def application(environ, start_response):
 WSGIServer(('', 8000), application).serve_forever()
 
 </code>
-</pre> 
+</pre>
 
 Using pywsgi we can however write our handler as a generator and
 yield the result chunk by chunk.
@@ -1303,20 +1303,20 @@ def application(environ, start_response):
 WSGIServer(('', 8000), application).serve_forever()
 
 </code>
-</pre> 
+</pre>
 
 But regardless, performance on Gevent servers is phenomenal
 compared to other Python servers. libev is a very vetted technology
 and its derivative servers are known to perform well at scale.
 
-To benchmark, try Apache Benchmark ``ab`` or see this 
-[Benchmark of Python WSGI Servers](http://nichol.as/benchmark-of-python-web-servers) 
+To benchmark, try Apache Benchmark ``ab`` or see this
+[Benchmark of Python WSGI Servers](http://nichol.as/benchmark-of-python-web-servers)
 for comparison with other servers.
 
 <pre>
 <code class="shell">$ ab -n 10000 -c 100 http://127.0.0.1:8000/
 </code>
-</pre> 
+</pre>
 
 ## Long Polling
 
