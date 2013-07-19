@@ -114,7 +114,7 @@ Any and all contributions are welcome.</p>
 <p>The primary pattern used in gevent is the <strong>Greenlet</strong>, a
 lightweight coroutine provided to Python as a C extension module.
 Greenlets all run inside of the OS process for the main
-program but are scheduled cooperatively. </p>
+program but are scheduled cooperatively.</p>
 <blockquote>
 <p>Only one greenlet is ever running at any given time.</p>
 </blockquote>
@@ -188,7 +188,7 @@ def gr2():
     print('Ended Polling: ', tic())
 
 def gr3():
-    print("Hey lets do some stuff while the greenlets poll, at", tic())
+    print("Hey lets do some stuff while the greenlets poll, ", tic())
     gevent.sleep(1)
 
 gevent.joinall([
@@ -202,7 +202,7 @@ gevent.joinall([
 <pre><code class="python">
 Started Polling:  at 0.0 seconds
 Started Polling:  at 0.0 seconds
-Hey lets do some stuff while the greenlets poll, at at 0.0 seconds
+Hey lets do some stuff while the greenlets poll,  at 0.0 seconds
 Ended Polling:  at 2.0 seconds
 Ended Polling:  at 2.0 seconds
 </pre></code></p>
@@ -251,16 +251,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 1 done
-Task 2 done
+Task 3 done
 Task 7 done
+Task 2 done
 Task 6 done
 Task 5 done
+Task 4 done
 Task 0 done
-Task 3 done
+Task 1 done
 Task 8 done
 Task 9 done
-Task 4 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -397,7 +397,7 @@ def foo(message, n):
 # foo
 thread1 = Greenlet.spawn(foo, "Hello", 1)
 
-# Wrapper for creating and runing a new Greenlet from the named
+# Wrapper for creating and running a new Greenlet from the named
 # function foo, with the passed arguments
 thread2 = gevent.spawn(foo, "I live!", 2)
 
@@ -614,10 +614,10 @@ Thread 3 timed out
 <h2 id="monkeypatching">Monkeypatching</h2>
 <p>Alas we come to dark corners of Gevent. I've avoided mentioning
 monkey patching up until now to try and motivate the powerful
-coroutine patterns but the time has come to discuss the dark arts
-of monkey-patching. If you noticed above we invoked the commnad
+coroutine patterns, but the time has come to discuss the dark arts
+of monkey-patching. If you noticed above we invoked the command
 <code>monkey.patch_socket()</code>. This is a purely side-effectful command to
-modify the standard library's socket library</p>
+modify the standard library's socket library.</p>
 <pre>
 <code class="python">import socket
 print( socket.socket )
@@ -669,29 +669,38 @@ is still evil, in this case it is a "useful evil".</p>
 Greenlets.</p>
 <pre>
 <code class="python">import gevent
-from gevent.event import AsyncResult
+from gevent.event import Event
 
-a = AsyncResult()
+'''
+Illustrates the use of events
+'''
+
+evt = Event()
 
 def setter():
-    """
-    After 3 seconds set wake all threads waiting on the value of
-    a.
-    """
+    '''After 3 seconds, wake all threads waiting on the value of evt'''
+    print('A: Hey wait for me, I have to do something')
     gevent.sleep(3)
-    a.set()
+    print("Ok, I'm done")
+    evt.set()
 
 def waiter():
-    """
-    After 3 seconds the get call will unblock.
-    """
-    a.get() # blocking
-    print 'I live!'
+    '''After 3 seconds the get call will unblock'''
+    print("I'll wait for you")
+    evt.wait()  # blocking
+    print("It's about time")
 
-gevent.joinall([
-    gevent.spawn(setter),
-    gevent.spawn(waiter),
-])
+def main():
+    gevent.joinall([
+        gevent.spawn(setter),
+        gevent.spawn(waiter),
+        gevent.spawn(waiter),
+        gevent.spawn(waiter),
+        gevent.spawn(waiter),
+        gevent.spawn(waiter)
+    ])
+
+if __name__ == '__main__': main()
 
 </code>
 </pre>
@@ -792,13 +801,13 @@ Quitting time!
 Quitting time!
 Quitting time!
 </pre></code></p>
-<p>Queues can also block on either <code>put</code> or <code>get</code> as the need arises. </p>
+<p>Queues can also block on either <code>put</code> or <code>get</code> as the need arises.</p>
 <p>Each of the <code>put</code> and <code>get</code> operations has a non-blocking
 counterpart, <code>put_nowait</code> and
 <code>get_nowait</code> which will not block, but instead raise
 either <code>gevent.queue.Empty</code> or
-<code>gevent.queue.Full</code> if the operation is not possible.</p>
-<p>In the example below we have the boss running simultaneously to the
+<code>gevent.queue.Full</code> in the operation is not possible.</p>
+<p>In this example we have the boss running simultaneously to the
 workers and have a restriction on the Queue preventing it from containing
 more than three elements. This restriction means that the <code>put</code>
 operation will block until there is space on the queue.
@@ -946,11 +955,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 10769424
+Hello from Greenlet 157878268
 Size of group 3
-Hello from Greenlet 10770544
+Hello from Greenlet 157878828
 Size of group 3
-Hello from Greenlet 10772304
+Hello from Greenlet 157878908
 Ordered
 ('task', 0)
 ('task', 1)
@@ -1243,7 +1252,7 @@ by the language Erlang. In short the main idea is that you have a
 collection of independent Actors which have an inbox from which
 they receive messages from other Actors. The main loop inside the
 Actor iterates through its messages and takes action according to
-its desired behavior. </p>
+its desired behavior.</p>
 <p>Gevent does not have a primitive Actor type, but we can define
 one very simply using a Queue inside of a subclassed Greenlet.</p>
 <pre>
@@ -1306,7 +1315,7 @@ gevent.joinall([ping, pong])
 <p><a href="http://www.zeromq.org/">ZeroMQ</a> is described by its authors as
 "a socket library that acts as a concurrency framework". It is a
 very powerful messaging layer for building concurrent and
-distributed applications. </p>
+distributed applications.</p>
 <p>ZeroMQ provides a variety of socket primitives, the simplest of
 which being a Request-Response socket pair. A socket has two
 methods of interest <code>send</code> and <code>recv</code>, both of which are
@@ -1400,7 +1409,7 @@ Henceforth called <code>wsgi</code> and <code>pywsgi</code>:</p>
 </ul>
 <p>In earlier versions of gevent before 1.0.x, gevent used libevent
 instead of libev. Libevent included a fast HTTP server which was
-used by gevent's <code>wsgi</code> server. </p>
+used by gevent's <code>wsgi</code> server.</p>
 <p>In gevent 1.0.x there is no http server included. Instead
 <code>gevent.wsgi</code> is now an alias for the pure Python server in
 <code>gevent.pywsgi</code>.</p>
