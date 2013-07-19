@@ -106,18 +106,18 @@ tic = lambda: 'at %1.1f seconds' % (time.time() - start)
 
 def gr1():
     # Busy waits for a second, but we don't want to stick around...
-    print('Started Polling: ', tic())
+    print('Started Polling: %s' % tic())
     select.select([], [], [], 2)
-    print('Ended Polling: ', tic())
+    print('Ended Polling: %s' % tic())
 
 def gr2():
     # Busy waits for a second, but we don't want to stick around...
-    print('Started Polling: ', tic())
+    print('Started Polling: %s' % tic())
     select.select([], [], [], 2)
-    print('Ended Polling: ', tic())
+    print('Ended Polling: %s' % tic())
 
 def gr3():
-    print("Hey lets do some stuff while the greenlets poll, ", tic())
+    print("Hey lets do some stuff while the greenlets poll, %s" % tic())
     gevent.sleep(1)
 
 gevent.joinall([
@@ -144,7 +144,7 @@ def task(pid):
     Some non-deterministic task
     """
     gevent.sleep(random.randint(0,2)*0.001)
-    print('Task', pid, 'done')
+    print('Task %s done' % pid)
 
 def synchronous():
     for i in range(1,10):
@@ -201,7 +201,7 @@ def fetch(pid):
     json_result = json.loads(result)
     datetime = json_result['datetime']
 
-    print('Process', pid, datetime)
+    print('Process %s: %s' % (pid, datetime))
     return json_result['datetime']
 
 def synchronous():
@@ -783,7 +783,7 @@ from gevent.pool import Group
 group = Group()
 
 def hello_from(n):
-    print('Size of group', len(group))
+    print('Size of group %s' % len(group))
     print('Hello from Greenlet %s' % id(getcurrent()))
 
 group.map(hello_from, xrange(3))
@@ -820,7 +820,7 @@ from gevent.pool import Pool
 pool = Pool(2)
 
 def hello_from(n):
-    print('Size of pool', len(pool))
+    print('Size of pool %s' % len(pool))
 
 pool.map(hello_from, xrange(3))
 ]]]
@@ -1178,7 +1178,7 @@ def server():
 
     for request in range(1,10):
         server_socket.send("Hello")
-        print('Switched to Server for ', request)
+        print('Switched to Server for %s' % request)
         # Implicit context switch occurs here
         server_socket.recv()
 
@@ -1189,7 +1189,7 @@ def client():
     for request in range(1,10):
 
         client_socket.recv()
-        print('Switched to Client for ', request)
+        print('Switched to Client for %s' % request)
         # Implicit context switch occurs here
         client_socket.send("World")
 
@@ -1495,7 +1495,7 @@ def join(room, uid):
 
     active_room = rooms[room]
     active_room.subscribe(user)
-    print('subscribe', active_room, user)
+    print('subscribe %s %s' % (active_room, user))
 
     messages = active_room.backlog()
 
