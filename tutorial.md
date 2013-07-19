@@ -576,29 +576,40 @@ Greenlets.
 
 <pre>
 <code class="python">import gevent
-from gevent.event import AsyncResult
+from gevent.event import Event
 
-a = AsyncResult()
+'''
+Illustrates the use of events
+'''
+
+
+evt = Event()
 
 def setter():
-    """
-    After 3 seconds set wake all threads waiting on the value of
-    a.
-    """
-    gevent.sleep(3)
-    a.set()
-
+    '''After 3 seconds, wake all threads waiting on the value of evt'''
+	print('A: Hey wait for me, I have to do something')
+	gevent.sleep(3)
+	print("Ok, I'm done")
+	evt.set()
+	
+	
 def waiter():
-    """
-    After 3 seconds the get call will unblock.
-    """
-    a.get() # blocking
-    print 'I live!'
+	'''After 3 seconds the get call will unblock'''
+	print("I'll wait for you")
+	evt.wait()  # blocking
+	print("It's about time")
+	
+def main():
+	gevent.joinall([
+		gevent.spawn(setter),
+		gevent.spawn(waiter),
+		gevent.spawn(waiter),
+		gevent.spawn(waiter),
+		gevent.spawn(waiter),
+		gevent.spawn(waiter)
+	])
 
-gevent.joinall([
-    gevent.spawn(setter),
-    gevent.spawn(waiter),
-])
+if __name__ == '__main__': main()
 
 </code>
 </pre>
