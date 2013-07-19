@@ -179,8 +179,8 @@ The important fact to notice is that the order of execution in
 the async case is essentially random and that the total execution
 time in the async case is much less than the sync case. In fact
 the maximum time for the synchronous case to complete is when
-each tasks pauses for 2 seconds resulting in a 20 seconds for the
-whole queue. In the async case the maximum runtime is roughly 2
+each tasks pauses for 0.002 seconds resulting in a 0.02 seconds for the
+whole queue. In the async case the maximum runtime is roughly 0.002
 seconds since none of the tasks block the execution of the
 others.
 
