@@ -201,7 +201,7 @@ def fetch(pid):
     json_result = json.loads(result)
     datetime = json_result['datetime']
 
-    print 'Process ', pid, datetime
+    print('Process', pid, datetime)
     return json_result['datetime']
 
 def synchronous():
@@ -214,10 +214,10 @@ def asynchronous():
         threads.append(gevent.spawn(fetch, i))
     gevent.joinall(threads)
 
-print 'Synchronous:'
+print('Synchronous:')
 synchronous()
 
-print 'Asynchronous:'
+print('Asynchronous:')
 asynchronous()
 </code>
 </pre>
@@ -247,7 +247,7 @@ run2 = [a for a in p.imap_unordered(echo, xrange(10))]
 run3 = [a for a in p.imap_unordered(echo, xrange(10))]
 run4 = [a for a in p.imap_unordered(echo, xrange(10))]
 
-print( run1 == run2 == run3 == run4 )
+print(run1 == run2 == run3 == run4)
 
 # Deterministic Gevent Pool
 
@@ -259,7 +259,7 @@ run2 = [a for a in p.imap_unordered(echo, xrange(10))]
 run3 = [a for a in p.imap_unordered(echo, xrange(10))]
 run4 = [a for a in p.imap_unordered(echo, xrange(10))]
 
-print( run1 == run2 == run3 == run4 )
+print(run1 == run2 == run3 == run4)
 </code>
 </pre>
 
@@ -451,7 +451,7 @@ def wait():
 try:
     gevent.spawn(wait).join()
 except Timeout:
-    print 'Could not complete'
+    print('Could not complete')
 
 </code>
 </pre>
@@ -521,18 +521,18 @@ modify the standard library's socket library.
 
 <pre>
 <code class="python">import socket
-print( socket.socket )
+print(socket.socket)
 
-print "After monkey patch"
+print("After monkey patch")
 from gevent import monkey
 monkey.patch_socket()
-print( socket.socket )
+print(socket.socket)
 
 import select
-print select.select
+print(select.select)
 monkey.patch_select()
-print "After monkey patch"
-print( select.select )
+print("After monkey patch")
+print(select.select)
 </code>
 </pre>
 
@@ -637,7 +637,7 @@ def waiter():
     After 3 seconds the get call will unblock after the setter
     puts a value into the AsyncResult.
     """
-    print a.get()
+    print(a.get())
 
 gevent.joinall([
     gevent.spawn(setter),
@@ -990,14 +990,14 @@ from gevent.subprocess import Popen, PIPE
 
 def cron():
     while True:
-        print "cron"
+        print("cron")
         gevent.sleep(0.2)
 
 g = gevent.spawn(cron)
 sub = Popen(['sleep 1; uname'], stdout=PIPE, shell=True)
 out, err = sub.communicate()
 g.kill()
-print out.rstrip()
+print(out.rstrip())
 </pre>
 
 <pre>
@@ -1125,13 +1125,13 @@ from gevent import Greenlet
 
 class Pinger(Actor):
     def receive(self, message):
-        print message
+        print(message)
         pong.inbox.put('ping')
         gevent.sleep(0)
 
 class Ponger(Actor):
     def receive(self, message):
-        print message
+        print(message)
         ping.inbox.put('pong')
         gevent.sleep(0)
 
@@ -1466,7 +1466,7 @@ class Room(object):
 
     def add(self, message):
         for user in self.users:
-            print user
+            print(user)
             user.queue.put_nowait(message)
         self.messages.append(message)
 
@@ -1495,7 +1495,7 @@ def join(room, uid):
 
     active_room = rooms[room]
     active_room.subscribe(user)
-    print 'subscribe', active_room, user
+    print('subscribe', active_room, user)
 
     messages = active_room.backlog()
 
