@@ -11,7 +11,7 @@ applications today.
 
 ### Contributors
 
-In chronological order of contribution: 
+In chronological order of contribution:
 [Stephen Diehl](http://www.stephendiehl.com)
 [J&eacute;r&eacute;my Bethmont](https://github.com/jerem)
 [sww](https://github.com/sww)
@@ -41,7 +41,7 @@ This page is also [available in Japanese](http://methane.github.com/gevent-tutor
 The primary pattern used in gevent is the <strong>Greenlet</strong>, a
 lightweight coroutine provided to Python as a C extension module.
 Greenlets all run inside of the OS process for the main
-program but are scheduled cooperatively. 
+program but are scheduled cooperatively.
 
 > Only one greenlet is ever running at any given time.
 
@@ -106,18 +106,18 @@ tic = lambda: 'at %1.1f seconds' % (time.time() - start)
 
 def gr1():
     # Busy waits for a second, but we don't want to stick around...
-    print('Started Polling: ', tic())
+    print('Started Polling: %s' % tic())
     select.select([], [], [], 2)
-    print('Ended Polling: ', tic())
+    print('Ended Polling: %s' % tic())
 
 def gr2():
     # Busy waits for a second, but we don't want to stick around...
-    print('Started Polling: ', tic())
+    print('Started Polling: %s' % tic())
     select.select([], [], [], 2)
-    print('Ended Polling: ', tic())
+    print('Ended Polling: %s' % tic())
 
 def gr3():
-    print("Hey lets do some stuff while the greenlets poll, ", tic())
+    print("Hey lets do some stuff while the greenlets poll, %s" % tic())
     gevent.sleep(1)
 
 gevent.joinall([
@@ -144,7 +144,7 @@ def task(pid):
     Some non-deterministic task
     """
     gevent.sleep(random.randint(0,2)*0.001)
-    print('Task', pid, 'done')
+    print('Task %s done' % pid)
 
 def synchronous():
     for i in range(1,10):
@@ -169,7 +169,7 @@ while each task executes.
 
 The important parts of the program are the
 ``gevent.spawn`` which wraps up the given function
-inside of a Greenlet thread. The list of initialized greenlets 
+inside of a Greenlet thread. The list of initialized greenlets
 are stored in the array ``threads`` which is passed to
 the ``gevent.joinall`` function which blocks the current
 program to run all the given greenlets. The execution will step
@@ -179,8 +179,8 @@ The important fact to notice is that the order of execution in
 the async case is essentially random and that the total execution
 time in the async case is much less than the sync case. In fact
 the maximum time for the synchronous case to complete is when
-each tasks pauses for 2 seconds resulting in a 20 seconds for the
-whole queue. In the async case the maximum runtime is roughly 2
+each tasks pauses for 0.002 seconds resulting in a 0.02 seconds for the
+whole queue. In the async case the maximum runtime is roughly 0.002
 seconds since none of the tasks block the execution of the
 others.
 
@@ -201,7 +201,7 @@ def fetch(pid):
     json_result = json.loads(result)
     datetime = json_result['datetime']
 
-    print 'Process ', pid, datetime
+    print('Process %s: %s' % (pid, datetime))
     return json_result['datetime']
 
 def synchronous():
@@ -214,10 +214,10 @@ def asynchronous():
         threads.append(gevent.spawn(fetch, i))
     gevent.joinall(threads)
 
-print 'Synchronous:'
+print('Synchronous:')
 synchronous()
 
-print 'Asynchronous:'
+print('Asynchronous:')
 asynchronous()
 </code>
 </pre>
@@ -247,7 +247,7 @@ run2 = [a for a in p.imap_unordered(echo, xrange(10))]
 run3 = [a for a in p.imap_unordered(echo, xrange(10))]
 run4 = [a for a in p.imap_unordered(echo, xrange(10))]
 
-print( run1 == run2 == run3 == run4 )
+print(run1 == run2 == run3 == run4)
 
 # Deterministic Gevent Pool
 
@@ -259,7 +259,7 @@ run2 = [a for a in p.imap_unordered(echo, xrange(10))]
 run3 = [a for a in p.imap_unordered(echo, xrange(10))]
 run4 = [a for a in p.imap_unordered(echo, xrange(10))]
 
-print( run1 == run2 == run3 == run4 )
+print(run1 == run2 == run3 == run4)
 </code>
 </pre>
 
@@ -308,7 +308,7 @@ def foo(message, n):
 # foo
 thread1 = Greenlet.spawn(foo, "Hello", 1)
 
-# Wrapper for creating and running a new Greenlet from the named 
+# Wrapper for creating and running a new Greenlet from the named
 # function foo, with the passed arguments
 thread2 = gevent.spawn(foo, "I live!", 2)
 
@@ -451,7 +451,7 @@ def wait():
 try:
     gevent.spawn(wait).join()
 except Timeout:
-    print 'Could not complete'
+    print('Could not complete')
 
 </code>
 </pre>
@@ -521,18 +521,18 @@ modify the standard library's socket library.
 
 <pre>
 <code class="python">import socket
-print( socket.socket )
+print(socket.socket)
 
-print "After monkey patch"
+print("After monkey patch")
 from gevent import monkey
 monkey.patch_socket()
-print( socket.socket )
+print(socket.socket)
 
 import select
-print select.select
+print(select.select)
 monkey.patch_select()
-print "After monkey patch"
-print( select.select )
+print("After monkey patch")
+print(select.select)
 </code>
 </pre>
 
@@ -591,14 +591,14 @@ def setter():
 	gevent.sleep(3)
 	print("Ok, I'm done")
 	evt.set()
-	
-	
+
+
 def waiter():
 	'''After 3 seconds the get call will unblock'''
 	print("I'll wait for you")
 	evt.wait()  # blocking
 	print("It's about time")
-	
+
 def main():
 	gevent.joinall([
 		gevent.spawn(setter),
@@ -616,7 +616,7 @@ if __name__ == '__main__': main()
 
 A extension of the Event object is the AsyncResult which
 allows you to send a value along with the wakeup call. This is
-sometimes called a future or a deferred, since it holds a 
+sometimes called a future or a deferred, since it holds a
 reference to a future value that can be set on an arbitrary time
 schedule.
 
@@ -637,7 +637,7 @@ def waiter():
     After 3 seconds the get call will unblock after the setter
     puts a value into the AsyncResult.
     """
-    print a.get()
+    print(a.get())
 
 gevent.joinall([
     gevent.spawn(setter),
@@ -685,10 +685,10 @@ gevent.joinall([
 ]]]
 [[[end]]]
 
-Queues can also block on either ``put`` or ``get`` as the need arises. 
+Queues can also block on either ``put`` or ``get`` as the need arises.
 
 Each of the ``put`` and ``get`` operations has a non-blocking
-counterpart, ``put_nowait`` and 
+counterpart, ``put_nowait`` and
 ``get_nowait`` which will not block, but instead raise
 either ``gevent.queue.Empty`` or
 ``gevent.queue.Full`` in the operation is not possible.
@@ -783,7 +783,7 @@ from gevent.pool import Group
 group = Group()
 
 def hello_from(n):
-    print('Size of group', len(group))
+    print('Size of group %s' % len(group))
     print('Hello from Greenlet %s' % id(getcurrent()))
 
 group.map(hello_from, xrange(3))
@@ -820,7 +820,7 @@ from gevent.pool import Pool
 pool = Pool(2)
 
 def hello_from(n):
-    print('Size of pool', len(pool))
+    print('Size of pool %s' % len(pool))
 
 pool.map(hello_from, xrange(3))
 ]]]
@@ -990,14 +990,14 @@ from gevent.subprocess import Popen, PIPE
 
 def cron():
     while True:
-        print "cron"
+        print("cron")
         gevent.sleep(0.2)
 
 g = gevent.spawn(cron)
 sub = Popen(['sleep 1; uname'], stdout=PIPE, shell=True)
 out, err = sub.communicate()
 g.kill()
-print out.rstrip()
+print(out.rstrip())
 </pre>
 
 <pre>
@@ -1084,7 +1084,7 @@ by the language Erlang. In short the main idea is that you have a
 collection of independent Actors which have an inbox from which
 they receive messages from other Actors. The main loop inside the
 Actor iterates through its messages and takes action according to
-its desired behavior. 
+its desired behavior.
 
 Gevent does not have a primitive Actor type, but we can define
 one very simply using a Queue inside of a subclassed Greenlet.
@@ -1125,13 +1125,13 @@ from gevent import Greenlet
 
 class Pinger(Actor):
     def receive(self, message):
-        print message
+        print(message)
         pong.inbox.put('ping')
         gevent.sleep(0)
 
 class Ponger(Actor):
     def receive(self, message):
-        print message
+        print(message)
         ping.inbox.put('pong')
         gevent.sleep(0)
 
@@ -1153,7 +1153,7 @@ gevent.joinall([ping, pong])
 [ZeroMQ](http://www.zeromq.org/) is described by its authors as
 "a socket library that acts as a concurrency framework". It is a
 very powerful messaging layer for building concurrent and
-distributed applications. 
+distributed applications.
 
 ZeroMQ provides a variety of socket primitives, the simplest of
 which being a Request-Response socket pair. A socket has two
@@ -1178,7 +1178,7 @@ def server():
 
     for request in range(1,10):
         server_socket.send("Hello")
-        print('Switched to Server for ', request)
+        print('Switched to Server for %s' % request)
         # Implicit context switch occurs here
         server_socket.recv()
 
@@ -1189,7 +1189,7 @@ def client():
     for request in range(1,10):
 
         client_socket.recv()
-        print('Switched to Client for ', request)
+        print('Switched to Client for %s' % request)
         # Implicit context switch occurs here
         client_socket.send("World")
 
@@ -1205,8 +1205,8 @@ gevent.joinall([publisher, client])
 
 <pre>
 <code class="python">
-# On Unix: Access with ``$ nc 127.0.0.1 5000`` 
-# On Window: Access with ``$ telnet 127.0.0.1 5000`` 
+# On Unix: Access with ``$ nc 127.0.0.1 5000``
+# On Window: Access with ``$ telnet 127.0.0.1 5000``
 
 from gevent.server import StreamServer
 
@@ -1231,7 +1231,7 @@ Henceforth called ``wsgi`` and ``pywsgi``:
 
 In earlier versions of gevent before 1.0.x, gevent used libevent
 instead of libev. Libevent included a fast HTTP server which was
-used by gevent's ``wsgi`` server. 
+used by gevent's ``wsgi`` server.
 
 In gevent 1.0.x there is no http server included. Instead
 ``gevent.wsgi`` is now an alias for the pure Python server in
@@ -1281,7 +1281,7 @@ def application(environ, start_response):
 WSGIServer(('', 8000), application).serve_forever()
 
 </code>
-</pre> 
+</pre>
 
 Using pywsgi we can however write our handler as a generator and
 yield the result chunk by chunk.
@@ -1303,20 +1303,20 @@ def application(environ, start_response):
 WSGIServer(('', 8000), application).serve_forever()
 
 </code>
-</pre> 
+</pre>
 
 But regardless, performance on Gevent servers is phenomenal
 compared to other Python servers. libev is a very vetted technology
 and its derivative servers are known to perform well at scale.
 
-To benchmark, try Apache Benchmark ``ab`` or see this 
-[Benchmark of Python WSGI Servers](http://nichol.as/benchmark-of-python-web-servers) 
+To benchmark, try Apache Benchmark ``ab`` or see this
+[Benchmark of Python WSGI Servers](http://nichol.as/benchmark-of-python-web-servers)
 for comparison with other servers.
 
 <pre>
 <code class="shell">$ ab -n 10000 -c 100 http://127.0.0.1:8000/
 </code>
-</pre> 
+</pre>
 
 ## Long Polling
 
@@ -1466,7 +1466,7 @@ class Room(object):
 
     def add(self, message):
         for user in self.users:
-            print user
+            print(user)
             user.queue.put_nowait(message)
         self.messages.append(message)
 
@@ -1495,7 +1495,7 @@ def join(room, uid):
 
     active_room = rooms[room]
     active_room.subscribe(user)
-    print 'subscribe', active_room, user
+    print('subscribe %s %s' % (active_room, user))
 
     messages = active_room.backlog()
 
