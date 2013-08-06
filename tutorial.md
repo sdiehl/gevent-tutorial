@@ -1,17 +1,14 @@
 [TOC]
 
-# Introduction
+# 介绍
 
-The structure of this tutorial assumes an intermediate level
-knowledge of Python but not much else. No knowledge of
-concurrency is expected. The goal is to give you
-the tools you need to get going with gevent, help you tame
-your existing concurrency problems and start writing asynchronous
-applications today.
+本指南假定读者有中级Python水平，但不要求有其它更多的知识，不期待读者有
+并发方面的知识。本指南的目标在于给予你需要的工具来开始使用gevent，帮助你
+驯服现有的并发问题，并从今开始编写异步应用程序。
 
-### Contributors
+### 贡献者
 
-In chronological order of contribution:
+按提供贡献的时间先后顺序列出如下:
 [Stephen Diehl](http://www.stephendiehl.com)
 [J&eacute;r&eacute;my Bethmont](https://github.com/jerem)
 [sww](https://github.com/sww)
@@ -24,42 +21,36 @@ In chronological order of contribution:
 [Alexis Metaireau](http://notmyidea.org)
 [Daniel Velkov](https://github.com/djv)
 
-Also thanks to Denis Bilenko for writing gevent and guidance in
-constructing this tutorial.
+同时感谢Denis Bilenko写了gevent和相应的指导以形成本指南。
 
-This is a collaborative document published under MIT license.
-Have something to add? See a typo? Fork and issue a
-pull request [Github](https://github.com/sdiehl/gevent-tutorial).
-Any and all contributions are welcome.
+这是一个以MIT许可证发布的协作文档。你想添加一些内容？或看见一个排版错误？
+Fork一个分支发布一个request到
+[Github](https://github.com/sdiehl/gevent-tutorial).
+我们欢迎任何贡献。
 
-This page is also [available in Japanese](http://methane.github.com/gevent-tutorial-ja).
+此页也有[日文版本](http://methane.github.com/gevent-tutorial-ja)。
 
-# Core
+# 核心部分
 
 ## Greenlets
 
-The primary pattern used in gevent is the <strong>Greenlet</strong>, a
-lightweight coroutine provided to Python as a C extension module.
-Greenlets all run inside of the OS process for the main
-program but are scheduled cooperatively.
+在gevent中用到的主要模式是<strong>Greenlet</strong>,
+它是一个以C扩展模块形式接入Python的轻量协程。
+Greenlet全部运行在主程序操作系统进程的内部，但它们被协作式地调度。
 
-> Only one greenlet is ever running at any given time.
+> 在任何时刻，只有一个协程在运行。
 
-This differs from any of the real parallelism constructs provided by
-``multiprocessing`` or ``threading`` libraries which do spin processes
-and POSIX threads which are scheduled by the operating system and
-are truly parallel.
+这与``multiprocessing``或``threading``等提供真正并行构造的库是不同的。
+这些库轮转使用操作系统调度的进程和线程，是真正的并行。
 
-## Synchronous & Asynchronous Execution
+## 同步和异步执行
 
-The core idea of concurrency is that a larger task can be broken down
-into a collection of subtasks which are scheduled to run simultaneously
-or *asynchronously*, instead of one at a time or *synchronously*. A
-switch between the two subtasks is known as a *context switch*.
+并发的核心思想在于，大的任务可以分解成一系列的子任务，后者可以被调度成
+同时执行或*异步*执行，而不是一次一个地或者*同步*地执行。两个子任务之间的
+切换也就是*上下文切换*。
 
-A context switch in gevent is done through *yielding*. In this case
-example we have two contexts which yield to each other through invoking
-``gevent.sleep(0)``.
+在gevent里面，上下文切换是通过*yielding*来完成的. 在下面的例子里，
+我们有两个上下文，通过调用``gevent.sleep(0)``，它们各自yield向对方。
 
 [[[cog
 import gevent
@@ -81,7 +72,7 @@ gevent.joinall([
 ]]]
 [[[end]]]
 
-It is illuminating to visualize the control flow of the program or walk
+下图It is illuminating to visualize the control flow of the program or walk
 through it with a debugger to see the context switches as they occur.
 
 ![Greenlet Control Flow](flow.gif)
