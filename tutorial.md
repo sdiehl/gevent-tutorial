@@ -28,14 +28,14 @@ Fork一个分支发布一个request到
 [Github](https://github.com/sdiehl/gevent-tutorial).
 我们欢迎任何贡献。
 
-此页也有[日文版本](http://methane.github.com/gevent-tutorial-ja)。
+本页也有[日文版本](http://methane.github.com/gevent-tutorial-ja)。
 
 # 核心部分
 
 ## Greenlets
 
 在gevent中用到的主要模式是<strong>Greenlet</strong>,
-它是一个以C扩展模块形式接入Python的轻量协程。
+它是以C扩展模块形式接入Python的轻量级协程。
 Greenlet全部运行在主程序操作系统进程的内部，但它们被协作式地调度。
 
 > 在任何时刻，只有一个协程在运行。
@@ -72,20 +72,16 @@ gevent.joinall([
 ]]]
 [[[end]]]
 
-下图It is illuminating to visualize the control flow of the program or walk
-through it with a debugger to see the context switches as they occur.
+下图将控制流形象化，就像在调试器中单步执行整个程序，以说明上下文切换如何发生。
 
 ![Greenlet Control Flow](flow.gif)
 
-The real power of gevent comes when we use it for network and IO
-bound functions which can be cooperatively scheduled. Gevent has
-taken care of all the details to ensure that your network
-libraries will implicitly yield their greenlet contexts whenever
-possible. I cannot stress enough what a powerful idiom this is.
-But maybe an example will illustrate.
+当我们在受限于网络或IO的函数中使用gevent，这些函数会被协作式的调度，
+gevent的真正能力会得到发挥。Gevent处理了所有的细节，
+来保证你的网络库会在可能的时候，隐式交出greenlet上下文的执行权。
+这样的一种用法是如何强大，怎么强调都不为过。或者我们举些例子来详述。
 
-In this case the ``select()`` function is normally a blocking
-call that polls on various file descriptors.
+下面例子中的``select()``函数通常是一个在各种文件描述符上轮询的阻塞调用。
 
 [[[cog
 import time
@@ -119,12 +115,9 @@ gevent.joinall([
 ]]]
 [[[end]]]
 
-Another somewhat synthetic example defines a ``task`` function
-which is *non-deterministic*
-(i.e. its output is not guaranteed to give the same result for
-the same inputs). In this case the side effect of running the
-function is that the task pauses its execution for a random
-number of seconds.
+下面是另外一个多少有点人造色彩的例子，定义一个*非确定性的(non-deterministic)*
+的``task``函数(给定相同输入的情况下，它的输出不保证相同)。
+此例中执行这个函数的副作用就是，每次task在它的执行过程中都会随机地停某些秒。
 
 [[[cog
 import gevent
@@ -153,31 +146,21 @@ asynchronous()
 ]]]
 [[[end]]]
 
-In the synchronous case all the tasks are run sequentially,
-which results in the main programming *blocking* (
-i.e. pausing the execution of the main program )
-while each task executes.
+上例中，在同步的部分，所有的task都同步的执行，
+结果当每个task在执行时主流程被*阻塞*(主流程的执行暂时停住)。
 
-The important parts of the program are the
-``gevent.spawn`` which wraps up the given function
-inside of a Greenlet thread. The list of initialized greenlets
-are stored in the array ``threads`` which is passed to
-the ``gevent.joinall`` function which blocks the current
-program to run all the given greenlets. The execution will step
-forward only when all the greenlets terminate.
+程序的重要部分是将task函数封装到Greenlet内部线程的``gevent.spawn``。
+初始化的greenlet列表存放在数组``threads``中，此数组被传给``gevent.joinall``
+函数，后者阻塞当前流程，并执行所有给定的greenlet。执行流程只会在
+所有greenlet执行完后才会继续向下走。
 
-The important fact to notice is that the order of execution in
-the async case is essentially random and that the total execution
-time in the async case is much less than the sync case. In fact
-the maximum time for the synchronous case to complete is when
-each tasks pauses for 0.002 seconds resulting in a 0.02 seconds for the
-whole queue. In the async case the maximum runtime is roughly 0.002
-seconds since none of the tasks block the execution of the
-others.
+要重点留意的是，异步的部分本质上是随机的，而且异步部分的整体运行时间比同步
+要大大减少。事实上，同步部分的最大运行时间，即是每个task停0.002秒，结果整个
+队列要停0.02秒。而异步部分的最大运行时间大致为0.002秒，因为没有任何一个task会
+阻塞其它task的执行。
 
-In a more common use case, asynchronously fetching data from a server,
-the runtime of ``fetch()`` will differ between
-requests, depending on the load on the remote server at the time of the request.
+一个更常见的应用场景，如异步地向服务器取数据，取数据操作的执行时间
+依赖于发起取数据请求时远端服务器的负载，各个请求的执行时间会有差别。
 
 <pre><code class="python">import gevent.monkey
 gevent.monkey.patch_socket()
@@ -213,12 +196,11 @@ asynchronous()
 </code>
 </pre>
 
-## Determinism
+## 确定性
 
-As mentioned previously, greenlets are deterministic. Given the same
-configuration of greenlets and the same set of inputs, they always
-produce the same output. For example, let's spread a task across a
-multiprocessing pool and compare its results to the one of a gevent pool.
+就像之前所提到的，greenlet具有确定性。在相同配置相同输入的情况下，它们总是
+会产生相同的输出。下面就有例子，我们在multiprocessing的pool之间执行一系列的
+任务，与在gevent的pool之间执行作比较。
 
 <pre>
 <code class="python">
@@ -259,26 +241,20 @@ print(run1 == run2 == run3 == run4)
 True</code>
 </pre>
 
-Even though gevent is normally deterministic, sources of
-non-determinism can creep into your program when you begin to
-interact with outside services such as sockets and files. Thus
-even though green threads are a form of "deterministic
-concurrency", they still can experience some of the same problems
-that POSIX threads and processes experience.
+即使gevent通常带有确定性，当开始与如socket或文件等外部服务交互时，
+不确定性也可能溜进你的程序中。因此尽管gevent线程是一种“确定的并发”形式，
+使用它仍然可能会遇到像使用POSIX线程或进程时遇到的那些问题。
 
-The perennial problem involved with concurrency is known as a
-*race condition*. Simply put, a race condition occurs when two concurrent threads
-/ processes depend on some shared resource but also attempt to
-modify this value. This results in resources which values become
-time-dependent on the execution order. This is a problem, and in
-general one should very much try to avoid race conditions since
-they result in a globally non-deterministic program behavior.
+涉及并发的常在问题就是*竞争条件(race condition)*。简单来说，
+当两个并发线程/进程都依赖于某个共享资源同时都尝试去修改它的时候，
+就会出现竞争条件。这会导致资源修改的结果状态依赖于时间和执行顺序。
+这是个问题，我们一般会做很多努力尝试避免竞争条件，
+因为它会导致整个程序行为变得不确定。
 
-The best approach to this is to simply avoid all global state at all
-times. Global state and import-time side effects will always come
-back to bite you!
+最好的办法是始终避免所有全局的状态。全局状态和导入时(import-time)副作用总是会
+反咬你一口！
 
-## Spawning Greenlets
+## 创建Greenlets
 
 gevent provides a few wrappers around Greenlet initialization.
 Some of the most common patterns are:
@@ -578,27 +554,27 @@ evt = Event()
 
 def setter():
     '''After 3 seconds, wake all threads waiting on the value of evt'''
-	print('A: Hey wait for me, I have to do something')
-	gevent.sleep(3)
-	print("Ok, I'm done")
-	evt.set()
+    print('A: Hey wait for me, I have to do something')
+    gevent.sleep(3)
+    print("Ok, I'm done")
+    evt.set()
 
 
 def waiter():
-	'''After 3 seconds the get call will unblock'''
-	print("I'll wait for you")
-	evt.wait()  # blocking
-	print("It's about time")
+    '''After 3 seconds the get call will unblock'''
+    print("I'll wait for you")
+    evt.wait()  # blocking
+    print("It's about time")
 
 def main():
-	gevent.joinall([
-		gevent.spawn(setter),
-		gevent.spawn(waiter),
-		gevent.spawn(waiter),
-		gevent.spawn(waiter),
-		gevent.spawn(waiter),
-		gevent.spawn(waiter)
-	])
+    gevent.joinall([
+        gevent.spawn(setter),
+        gevent.spawn(waiter),
+        gevent.spawn(waiter),
+        gevent.spawn(waiter),
+        gevent.spawn(waiter),
+        gevent.spawn(waiter)
+    ])
 
 if __name__ == '__main__': main()
 
