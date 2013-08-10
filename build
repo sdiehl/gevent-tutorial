@@ -40,8 +40,8 @@ r3 = re.sub(r'\]\]\]',end_code + '\n' + start_code, r2)
 
 rendered_code = r3
 
-body = markdown.markdown(rendered_code, extensions=['toc'])
+body = markdown.markdown(rendered_code.decode('utf-8'), extensions=['toc'])
 
 with open(OUTPUT, 'w+') as f:
-    f.write(template.render(body=body))
+    f.write(template.render(body=body).encode('utf-8'))
 print 'Wrote', OUTPUT
