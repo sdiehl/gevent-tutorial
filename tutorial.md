@@ -614,7 +614,7 @@ if __name__ == '__main__': main()
 </code>
 </pre>
 
-A extension of the Event object is the AsyncResult which
+An extension of the Event object is the AsyncResult which
 allows you to send a value along with the wakeup call. This is
 sometimes called a future or a deferred, since it holds a
 reference to a future value that can be set on an arbitrary time
@@ -691,7 +691,7 @@ Each of the ``put`` and ``get`` operations has a non-blocking
 counterpart, ``put_nowait`` and
 ``get_nowait`` which will not block, but instead raise
 either ``gevent.queue.Empty`` or
-``gevent.queue.Full`` in the operation is not possible.
+``gevent.queue.Full`` if the operation is not possible.
 
 In this example we have the boss running simultaneously to the
 workers and have a restriction on the Queue preventing it from containing
@@ -929,10 +929,10 @@ gevent.joinall([g1, g2])
 ]]]
 [[[end]]]
 
-Many web framework thats integrate with gevent store HTTP session
-objects inside of gevent thread locals. For example using the
+Many web frameworks that use gevent store HTTP session
+objects inside gevent thread locals. For example, using the
 Werkzeug utility library and its proxy object we can create
-Flask style request objects.
+Flask-style request objects.
 
 <pre>
 <code class="python">from gevent.local import local
