@@ -700,7 +700,7 @@ operation will block until there is space on the queue.
 Conversely the ``get`` operation will block if there are
 no elements on the queue to fetch, it also takes a timeout
 argument to allow for the queue to exit with the exception
-``gevent.queue.Empty`` if no work can found within the
+``gevent.queue.Empty`` if no work can be found within the
 time frame of the Timeout.
 
 [[[cog
