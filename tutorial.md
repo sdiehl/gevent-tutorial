@@ -709,11 +709,11 @@ from gevent.queue import Queue, Empty
 
 tasks = Queue(maxsize=3)
 
-def worker(n):
+def worker(name):
     try:
         while True:
             task = tasks.get(timeout=1) # decrements queue size by 1
-            print('Worker %s got task %s' % (n, task))
+            print('Worker %s got task %s' % (name, task))
             gevent.sleep(0)
     except Empty:
         print('Quitting time!')
