@@ -700,7 +700,7 @@ operation will block until there is space on the queue.
 Conversely the ``get`` operation will block if there are
 no elements on the queue to fetch, it also takes a timeout
 argument to allow for the queue to exit with the exception
-``gevent.queue.Empty`` if no work can found within the
+``gevent.queue.Empty`` if no work can be found within the
 time frame of the Timeout.
 
 [[[cog
@@ -709,11 +709,11 @@ from gevent.queue import Queue, Empty
 
 tasks = Queue(maxsize=3)
 
-def worker(n):
+def worker(name):
     try:
         while True:
             task = tasks.get(timeout=1) # decrements queue size by 1
-            print('Worker %s got task %s' % (n, task))
+            print('Worker %s got task %s' % (name, task))
             gevent.sleep(0)
     except Empty:
         print('Quitting time!')
