@@ -57,7 +57,7 @@ into a collection of subtasks which are scheduled to run simultaneously
 or *asynchronously*, instead of one at a time or *synchronously*. A
 switch between the two subtasks is known as a *context switch*.
 
-A context switch in gevent is done through *yielding*. In this case
+A context switch in gevent is done through *yielding*. In this 
 example we have two contexts which yield to each other through invoking
 ``gevent.sleep(0)``.
 
