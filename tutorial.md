@@ -860,7 +860,7 @@ class SocketPool(object):
 A semaphore is a low level synchronization primitive that allows
 greenlets to coordinate and limit concurrent access or execution. A
 semaphore exposes two methods, ``acquire`` and ``release`` The
-difference between the number of times and a semaphore has been
+difference between the number of times a semaphore has been
 acquired and released is called the bound of the semaphore. If a
 semaphore bound reaches 0 it will block until another greenlet
 releases its acquisition.
