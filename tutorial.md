@@ -654,7 +654,7 @@ operations but are written in a way such that they can be safely
 manipulated across Greenlets.
 
 For example if one Greenlet grabs an item off of the queue, the
-same item will not grabbed by another Greenlet executing
+same item will not be grabbed by another Greenlet executing
 simultaneously.
 
 [[[cog
