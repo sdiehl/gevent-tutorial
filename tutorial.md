@@ -1426,7 +1426,7 @@ HTML Page:
 ## Chat Server
 
 The final motivating example, a realtime chat room. This example
-requires <a href="http://flask.pocoo.org/">Flask</a> ( but not neccesarily so, you could use Django,
+requires <a href="http://flask.pocoo.org/">Flask</a> ( but not necessarily so, you could use Django,
 Pyramid, etc ). The corresponding Javascript and HTML files can
 be found <a href="https://github.com/sdiehl/minichat">here</a>.
 
