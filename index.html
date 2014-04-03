@@ -742,8 +742,8 @@ gevent.joinall([
 <p>Queues are ordered sets of data that have the usual <code>put</code> / <code>get</code>
 operations but are written in a way such that they can be safely
 manipulated across Greenlets.</p>
-<p>For example if one Greenlet grabs an item off of the queue, the
-same item will not grabbed by another Greenlet executing
+<p>For example, if one Greenlet grabs an item off of the queue, the
+same item will not be grabbed by another Greenlet executing
 simultaneously.</p>
 <pre><code class="python">
 import gevent
@@ -1264,7 +1264,7 @@ class Actor(gevent.Greenlet):
 
     def __init__(self):
         self.inbox = Queue()
-        Greenlet.__init__(self)
+        gevent.Greenlet.__init__(self)
 
     def receive(self, message):
         """

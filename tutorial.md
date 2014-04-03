@@ -58,7 +58,7 @@ into a collection of subtasks which are scheduled to run simultaneously
 or *asynchronously*, instead of one at a time or *synchronously*. A
 switch between the two subtasks is known as a *context switch*.
 
-A context switch in gevent is done through *yielding*. In this case
+A context switch in gevent is done through *yielding*. In this 
 example we have two contexts which yield to each other through invoking
 ``gevent.sleep(0)``.
 
@@ -394,7 +394,7 @@ print(loser.ready())  # True
 print(winner.successful()) # True
 print(loser.successful())  # False
 
-# The exception raised in fail, will not propogate outside the
+# The exception raised in fail, will not propagate outside the
 # greenlet. A stack trace will be printed to stdout but it
 # will not unwind the stack of the parent.
 
@@ -425,7 +425,7 @@ def run_forever():
     gevent.sleep(1000)
 
 if __name__ == '__main__':
-    gevent.signal(signal.SIGQUIT, gevent.shutdown)
+    gevent.signal(signal.SIGQUIT, gevent.kill)
     thread = gevent.spawn(run_forever)
     thread.join()
 </code>
@@ -615,7 +615,7 @@ if __name__ == '__main__': main()
 </code>
 </pre>
 
-A extension of the Event object is the AsyncResult which
+An extension of the Event object is the AsyncResult which
 allows you to send a value along with the wakeup call. This is
 sometimes called a future or a deferred, since it holds a
 reference to a future value that can be set on an arbitrary time
@@ -655,7 +655,7 @@ operations but are written in a way such that they can be safely
 manipulated across Greenlets.
 
 For example if one Greenlet grabs an item off of the queue, the
-same item will not grabbed by another Greenlet executing
+same item will not be grabbed by another Greenlet executing
 simultaneously.
 
 [[[cog
@@ -692,7 +692,7 @@ Each of the ``put`` and ``get`` operations has a non-blocking
 counterpart, ``put_nowait`` and
 ``get_nowait`` which will not block, but instead raise
 either ``gevent.queue.Empty`` or
-``gevent.queue.Full`` in the operation is not possible.
+``gevent.queue.Full`` if the operation is not possible.
 
 In this example we have the boss running simultaneously to the
 workers and have a restriction on the Queue preventing it from containing
@@ -701,7 +701,7 @@ operation will block until there is space on the queue.
 Conversely the ``get`` operation will block if there are
 no elements on the queue to fetch, it also takes a timeout
 argument to allow for the queue to exit with the exception
-``gevent.queue.Empty`` if no work can found within the
+``gevent.queue.Empty`` if no work can be found within the
 time frame of the Timeout.
 
 [[[cog
@@ -710,11 +710,11 @@ from gevent.queue import Queue, Empty
 
 tasks = Queue(maxsize=3)
 
-def worker(n):
+def worker(name):
     try:
         while True:
             task = tasks.get(timeout=1) # decrements queue size by 1
-            print('Worker %s got task %s' % (n, task))
+            print('Worker %s got task %s' % (name, task))
             gevent.sleep(0)
     except Empty:
         print('Quitting time!')
@@ -861,7 +861,7 @@ class SocketPool(object):
 A semaphore is a low level synchronization primitive that allows
 greenlets to coordinate and limit concurrent access or execution. A
 semaphore exposes two methods, ``acquire`` and ``release`` The
-difference between the number of times and a semaphore has been
+difference between the number of times a semaphore has been
 acquired and released is called the bound of the semaphore. If a
 semaphore bound reaches 0 it will block until another greenlet
 releases its acquisition.
@@ -930,10 +930,10 @@ gevent.joinall([g1, g2])
 ]]]
 [[[end]]]
 
-Many web framework thats integrate with gevent store HTTP session
-objects inside of gevent thread locals. For example using the
+Many web frameworks that use gevent store HTTP session
+objects inside gevent thread locals. For example, using the
 Werkzeug utility library and its proxy object we can create
-Flask style request objects.
+Flask-style request objects.
 
 <pre>
 <code class="python">from gevent.local import local
@@ -1427,7 +1427,7 @@ HTML Page:
 ## Chat Server
 
 The final motivating example, a realtime chat room. This example
-requires <a href="http://flask.pocoo.org/">Flask</a> ( but not neccesarily so, you could use Django,
+requires <a href="http://flask.pocoo.org/">Flask</a> ( but not necessarily so, you could use Django,
 Pyramid, etc ). The corresponding Javascript and HTML files can
 be found <a href="https://github.com/sdiehl/minichat">here</a>.
 
