@@ -393,7 +393,7 @@ print(loser.ready())  # True
 print(winner.successful()) # True
 print(loser.successful())  # False
 
-# The exception raised in fail, will not propogate outside the
+# The exception raised in fail, will not propagate outside the
 # greenlet. A stack trace will be printed to stdout but it
 # will not unwind the stack of the parent.
 
@@ -424,7 +424,7 @@ def run_forever():
     gevent.sleep(1000)
 
 if __name__ == '__main__':
-    gevent.signal(signal.SIGQUIT, gevent.shutdown)
+    gevent.signal(signal.SIGQUIT, gevent.kill)
     thread = gevent.spawn(run_forever)
     thread.join()
 </code>
