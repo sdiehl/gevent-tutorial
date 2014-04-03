@@ -128,7 +128,7 @@ are truly parallel.</p>
 into a collection of subtasks which are scheduled to run simultaneously
 or <em>asynchronously</em>, instead of one at a time or <em>synchronously</em>. A
 switch between the two subtasks is known as a <em>context switch</em>.</p>
-<p>A context switch in gevent is done through <em>yielding</em>. In this case
+<p>A context switch in gevent is done through <em>yielding</em>. In this 
 example we have two contexts which yield to each other through invoking
 <code>gevent.sleep(0)</code>.</p>
 <pre><code class="python">
@@ -252,15 +252,15 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 0 done
-Task 9 done
-Task 2 done
-Task 6 done
-Task 3 done
 Task 4 done
 Task 8 done
-Task 1 done
+Task 9 done
+Task 0 done
+Task 6 done
 Task 5 done
+Task 1 done
+Task 3 done
+Task 2 done
 Task 7 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
@@ -486,7 +486,7 @@ print(loser.ready())  # True
 print(winner.successful()) # True
 print(loser.successful())  # False
 
-# The exception raised in fail, will not propogate outside the
+# The exception raised in fail, will not propagate outside the
 # greenlet. A stack trace will be printed to stdout but it
 # will not unwind the stack of the parent.
 
@@ -525,7 +525,7 @@ def run_forever():
     gevent.sleep(1000)
 
 if __name__ == '__main__':
-    gevent.signal(signal.SIGQUIT, gevent.shutdown)
+    gevent.signal(signal.SIGQUIT, gevent.kill)
     thread = gevent.spawn(run_forever)
     thread.join()
 </code>
@@ -706,7 +706,7 @@ if __name__ == '__main__': main()
 </code>
 </pre>
 
-<p>A extension of the Event object is the AsyncResult which
+<p>An extension of the Event object is the AsyncResult which
 allows you to send a value along with the wakeup call. This is
 sometimes called a future or a deferred, since it holds a
 reference to a future value that can be set on an arbitrary time
@@ -742,7 +742,7 @@ gevent.joinall([
 <p>Queues are ordered sets of data that have the usual <code>put</code> / <code>get</code>
 operations but are written in a way such that they can be safely
 manipulated across Greenlets.</p>
-<p>For example, if one Greenlet grabs an item off of the queue, the
+<p>For example if one Greenlet grabs an item off of the queue, the
 same item will not be grabbed by another Greenlet executing
 simultaneously.</p>
 <pre><code class="python">
@@ -807,7 +807,7 @@ Quitting time!
 counterpart, <code>put_nowait</code> and
 <code>get_nowait</code> which will not block, but instead raise
 either <code>gevent.queue.Empty</code> or
-<code>gevent.queue.Full</code> in the operation is not possible.</p>
+<code>gevent.queue.Full</code> if the operation is not possible.</p>
 <p>In this example we have the boss running simultaneously to the
 workers and have a restriction on the Queue preventing it from containing
 more than three elements. This restriction means that the <code>put</code>
@@ -815,7 +815,7 @@ operation will block until there is space on the queue.
 Conversely the <code>get</code> operation will block if there are
 no elements on the queue to fetch, it also takes a timeout
 argument to allow for the queue to exit with the exception
-<code>gevent.queue.Empty</code> if no work can found within the
+<code>gevent.queue.Empty</code> if no work can be found within the
 time frame of the Timeout.</p>
 <pre><code class="python">
 import gevent
@@ -823,11 +823,11 @@ from gevent.queue import Queue, Empty
 
 tasks = Queue(maxsize=3)
 
-def worker(n):
+def worker(name):
     try:
         while True:
             task = tasks.get(timeout=1) # decrements queue size by 1
-            print('Worker %s got task %s' % (n, task))
+            print('Worker %s got task %s' % (name, task))
             gevent.sleep(0)
     except Empty:
         print('Quitting time!')
@@ -956,11 +956,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 12538576
+Hello from Greenlet 35427024
 Size of group 3
-Hello from Greenlet 12539056
+Hello from Greenlet 35427504
 Size of group 3
-Hello from Greenlet 12540016
+Hello from Greenlet 35428464
 Ordered
 ('task', 0)
 ('task', 1)
@@ -1024,7 +1024,7 @@ class SocketPool(object):
 <p>A semaphore is a low level synchronization primitive that allows
 greenlets to coordinate and limit concurrent access or execution. A
 semaphore exposes two methods, <code>acquire</code> and <code>release</code> The
-difference between the number of times and a semaphore has been
+difference between the number of times a semaphore has been
 acquired and released is called the bound of the semaphore. If a
 semaphore bound reaches 0 it will block until another greenlet
 releases its acquisition.</p>
@@ -1106,10 +1106,10 @@ gevent.joinall([g1, g2])
 2
 x is not local to f2
 </pre></code></p>
-<p>Many web framework thats integrate with gevent store HTTP session
-objects inside of gevent thread locals. For example using the
+<p>Many web frameworks that use gevent store HTTP session
+objects inside gevent thread locals. For example, using the
 Werkzeug utility library and its proxy object we can create
-Flask style request objects.</p>
+Flask-style request objects.</p>
 <pre>
 <code class="python">from gevent.local import local
 from werkzeug.local import LocalProxy
@@ -1264,7 +1264,7 @@ class Actor(gevent.Greenlet):
 
     def __init__(self):
         self.inbox = Queue()
-        gevent.Greenlet.__init__(self)
+        Greenlet.__init__(self)
 
     def receive(self, message):
         """
@@ -1587,7 +1587,7 @@ server.serve_forever()
 </code></pre>
 <h2 id="chat-server">Chat Server</h2>
 <p>The final motivating example, a realtime chat room. This example
-requires <a href="http://flask.pocoo.org/">Flask</a> ( but not neccesarily so, you could use Django,
+requires <a href="http://flask.pocoo.org/">Flask</a> ( but not necessarily so, you could use Django,
 Pyramid, etc ). The corresponding Javascript and HTML files can
 be found <a href="https://github.com/sdiehl/minichat">here</a>.</p>
 <pre>
