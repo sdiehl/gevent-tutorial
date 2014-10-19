@@ -1165,9 +1165,9 @@ manner.  You can install gevent-zeromq from PyPi via:  ``pip install
 gevent-zeromq``
 
 [[[cog
-# Note: Remember to ``pip install pyzmq gevent_zeromq``
+# Note: Remember to ``pip install pyzmq``
 import gevent
-from gevent_zeromq import zmq
+import zmq.green as zmq
 
 # Global Context
 context = zmq.Context()
