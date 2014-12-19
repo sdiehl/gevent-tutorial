@@ -108,8 +108,11 @@ constructing this tutorial.</p>
 Have something to add? See a typo? Fork and issue a
 pull request <a href="https://github.com/sdiehl/gevent-tutorial">Github</a>.
 Any and all contributions are welcome.</p>
-<p>This page is also available in <a href="http://methane.github.com/gevent-tutorial-ja">Japanese</a>, 
-<a href="http://xlambda.com/gevent-tutorial/">Chinese</a> and <a href="http://ovnicraft.github.io/gevent/">Spanish</a>.</p>
+<p>This page is also available in
+<a href="http://methane.github.com/gevent-tutorial-ja">Japanese</a>,
+<a href="http://xlambda.com/gevent-tutorial/">Chinese</a>,
+<a href="http://ovnicraft.github.io/gevent/">Spanish</a> and
+<a href="http://pbertera.github.io/gevent-tutorial-it/">Italian</a>.</p>
 <h1 id="core">Core</h1>
 <h2 id="greenlets">Greenlets</h2>
 <p>The primary pattern used in gevent is the <strong>Greenlet</strong>, a
@@ -252,16 +255,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 4 done
-Task 8 done
-Task 9 done
 Task 0 done
+Task 2 done
+Task 8 done
 Task 6 done
+Task 4 done
+Task 7 done
 Task 5 done
 Task 1 done
 Task 3 done
-Task 2 done
-Task 7 done
+Task 9 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -956,11 +959,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 35427024
+Hello from Greenlet 21803728
 Size of group 3
-Hello from Greenlet 35427504
+Hello from Greenlet 21804208
 Size of group 3
-Hello from Greenlet 35428464
+Hello from Greenlet 21805168
 Ordered
 ('task', 0)
 ('task', 1)

@@ -32,8 +32,11 @@ Have something to add? See a typo? Fork and issue a
 pull request [Github](https://github.com/sdiehl/gevent-tutorial).
 Any and all contributions are welcome.
 
-This page is also available in [Japanese](http://methane.github.com/gevent-tutorial-ja), 
-[Chinese](http://xlambda.com/gevent-tutorial/) and [Spanish](http://ovnicraft.github.io/gevent/).
+This page is also available in
+[Japanese](http://methane.github.com/gevent-tutorial-ja),
+[Chinese](http://xlambda.com/gevent-tutorial/),
+[Spanish](http://ovnicraft.github.io/gevent/) and
+[Italian](http://pbertera.github.io/gevent-tutorial-it/).
 
 # Core
 
