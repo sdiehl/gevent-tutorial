@@ -18,18 +18,6 @@
     <link rel="stylesheet" href="github.min.css">
 
     <title>Gevent Tutorial</title>
-
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-49839533-3', 'auto');
-      ga('send', 'pageview');
-
-    </script>
-
 </head>
 <style>
 
@@ -123,8 +111,9 @@ Any and all contributions are welcome.</p>
 <p>This page is also available in
 <a href="http://methane.github.com/gevent-tutorial-ja">Japanese</a>,
 <a href="http://xlambda.com/gevent-tutorial/">Chinese</a>,
-<a href="http://ovnicraft.github.io/gevent/">Spanish</a> and
-<a href="http://pbertera.github.io/gevent-tutorial-it/">Italian</a>.</p>
+<a href="http://ovnicraft.github.io/gevent/">Spanish</a>,
+<a href="http://pbertera.github.io/gevent-tutorial-it/">Italian</a> and
+<a href="https://hellerve.github.io/gevent-tutorial-de">German</a>.</p>
 <h1 id="core">Core</h1>
 <h2 id="greenlets">Greenlets</h2>
 <p>The primary pattern used in gevent is the <strong>Greenlet</strong>, a
@@ -267,16 +256,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 0 done
 Task 2 done
-Task 8 done
-Task 6 done
-Task 4 done
-Task 7 done
 Task 5 done
+Task 6 done
+Task 8 done
+Task 9 done
+Task 0 done
+Task 4 done
 Task 1 done
 Task 3 done
-Task 9 done
+Task 7 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -971,11 +960,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 21803728
+Hello from Greenlet 31904464
 Size of group 3
-Hello from Greenlet 21804208
+Hello from Greenlet 31904944
 Size of group 3
-Hello from Greenlet 21805168
+Hello from Greenlet 31905904
 Ordered
 ('task', 0)
 ('task', 1)
