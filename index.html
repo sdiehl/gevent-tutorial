@@ -271,16 +271,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 1 done
+Task 7 done
+Task 4 done
+Task 5 done
+Task 8 done
 Task 9 done
 Task 0 done
+Task 1 done
 Task 2 done
 Task 3 done
-Task 5 done
 Task 6 done
-Task 8 done
-Task 4 done
-Task 7 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -312,7 +312,7 @@ import urllib2
 import simplejson as json
 
 def fetch(pid):
-    response = urllib2.urlopen('http://json-time.appspot.com/time.json')
+    response = urllib2.urlopen('http://jsontime.herokuapp.com/')
     result = response.read()
     json_result = json.loads(result)
     datetime = json_result['datetime']
@@ -975,11 +975,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 140210785595632
+Hello from Greenlet 139643393732848
 Size of group 3
-Hello from Greenlet 140210785596752
+Hello from Greenlet 139643393733968
 Size of group 3
-Hello from Greenlet 140210785596272
+Hello from Greenlet 139643393733488
 Ordered
 ('task', 0)
 ('task', 1)
