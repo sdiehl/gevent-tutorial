@@ -121,8 +121,7 @@ applications today.</p>
 <a href="https://github.com/jianbin-netskope">Jianbin Wei</a>
 <a href="https://github.com/ToxicWar">Anton Larkin</a>
 <a href="https://github.com/matiasherranz-santex">Matias Herranz</a>
-<a href="http://www.bertera.it">Pietro Bertera</a>
-</p>
+<a href="http://www.bertera.it">Pietro Bertera</a></p>
 <p>Also thanks to Denis Bilenko for writing gevent and guidance in
 constructing this tutorial.</p>
 <p>This is a collaborative document published under MIT license.
@@ -272,16 +271,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 2 done
-Task 5 done
-Task 3 done
-Task 9 done
-Task 8 done
-Task 6 done
 Task 1 done
-Task 7 done
+Task 9 done
 Task 0 done
+Task 2 done
+Task 3 done
+Task 5 done
+Task 6 done
+Task 8 done
 Task 4 done
+Task 7 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -798,26 +797,26 @@ Worker steve got task 1
 Worker john got task 2
 Worker nancy got task 3
 Worker steve got task 4
-Worker nancy got task 5
-Worker john got task 6
+Worker john got task 5
+Worker nancy got task 6
 Worker steve got task 7
 Worker john got task 8
 Worker nancy got task 9
 Worker steve got task 10
-Worker nancy got task 11
-Worker john got task 12
+Worker john got task 11
+Worker nancy got task 12
 Worker steve got task 13
 Worker john got task 14
 Worker nancy got task 15
 Worker steve got task 16
-Worker nancy got task 17
-Worker john got task 18
+Worker john got task 17
+Worker nancy got task 18
 Worker steve got task 19
 Worker john got task 20
 Worker nancy got task 21
 Worker steve got task 22
-Worker nancy got task 23
-Worker john got task 24
+Worker john got task 23
+Worker nancy got task 24
 Quitting time!
 Quitting time!
 Quitting time!
@@ -880,21 +879,21 @@ Worker steve got task 1
 Worker john got task 2
 Worker bob got task 3
 Worker steve got task 4
-Worker bob got task 5
-Worker john got task 6
+Worker john got task 5
+Worker bob got task 6
 Assigned all work in iteration 1
 Worker steve got task 7
 Worker john got task 8
 Worker bob got task 9
 Worker steve got task 10
-Worker bob got task 11
-Worker john got task 12
+Worker john got task 11
+Worker bob got task 12
 Worker steve got task 13
 Worker john got task 14
 Worker bob got task 15
 Worker steve got task 16
-Worker bob got task 17
-Worker john got task 18
+Worker john got task 17
+Worker bob got task 18
 Assigned all work in iteration 2
 Worker steve got task 19
 Quitting time!
@@ -976,11 +975,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 36360912
+Hello from Greenlet 140210785595632
 Size of group 3
-Hello from Greenlet 36361392
+Hello from Greenlet 140210785596752
 Size of group 3
-Hello from Greenlet 36362352
+Hello from Greenlet 140210785596272
 Ordered
 ('task', 0)
 ('task', 1)
@@ -1346,9 +1345,9 @@ uses gevent.socket to poll ZeroMQ sockets in a non-blocking
 manner.  You can install gevent-zeromq from PyPi via:  <code>pip install
 gevent-zeromq</code></p>
 <pre><code class="python">
-# Note: Remember to ``pip install pyzmq gevent_zeromq``
+# Note: Remember to ``pip install pyzmq``
 import gevent
-from gevent_zeromq import zmq
+import zmq.green as zmq
 
 # Global Context
 context = zmq.Context()
