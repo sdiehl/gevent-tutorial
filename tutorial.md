@@ -36,8 +36,10 @@ This page is also available in
 [Japanese](http://methane.github.com/gevent-tutorial-ja),
 [Chinese](http://xlambda.com/gevent-tutorial/),
 [Spanish](http://ovnicraft.github.io/gevent/),
-[Italian](http://pbertera.github.io/gevent-tutorial-it/) and
-[German](https://hellerve.github.io/gevent-tutorial-de).
+[Italian](http://pbertera.github.io/gevent-tutorial-it/),
+[German](https://hellerve.github.io/gevent-tutorial-de) and
+[Korean](http://leekchan.com/gevent-tutorial-ko/)
+.
 
 # Core
 
