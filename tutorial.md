@@ -1179,15 +1179,14 @@ ZeroMQ provides a variety of socket primitives, the simplest of
 which being a Request-Response socket pair. A socket has two
 methods of interest ``send`` and ``recv``, both of which are
 normally blocking operations. But this is remedied by a briliant
-library by [Travis Cline](https://github.com/traviscline) which
-uses gevent.socket to poll ZeroMQ sockets in a non-blocking
-manner.  You can install gevent-zeromq from PyPi via:  ``pip install
-gevent-zeromq``
+[library](https://github.com/tmc/gevent-zeromq) (is now part of PyZMQ)
+by [Travis Cline](https://github.com/tmc) which uses gevent.socket
+to poll ZeroMQ sockets in a non-blocking manner.
 
 [[[cog
-# Note: Remember to ``pip install pyzmq gevent_zeromq``
+# Note: Remember to ``pip install pyzmq``
 import gevent
-from gevent_zeromq import zmq
+import zmq.green as zmq
 
 # Global Context
 context = zmq.Context()
