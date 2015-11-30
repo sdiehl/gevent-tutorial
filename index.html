@@ -101,21 +101,34 @@ applications today.</p>
 <a href="https://github.com/youngsterxyf">youngsterxyf</a>
 <a href="https://github.com/ehebert">Eddie Hebert</a>
 <a href="http://notmyidea.org">Alexis Metaireau</a>
-<a href="https://github.com/djv">Daniel Velkov</a></p>
+<a href="https://github.com/djv">Daniel Velkov</a>
+<a href="https://github.com/sww">Sean Wang</a>
+<a href="https://github.com/methane">Inada Naoki</a>
+<a href="https://github.com/brouberol">Balthazar Rouberol</a>
+<a href="https://github.com/iepathos">Glen Baker</a>
+<a href="https://gehrcke.de">Jan-Philip Gehrcke</a>
+<a href="https://github.com/zr40">Matthijs van der Vleuten</a>
+<a href="http://simonsblog.co.uk">Simon Hayward</a>
+<a href="https://github.com/AJamesPhillips">Alexander James Phillips</a>
+<a href="https://github.com/ramiro">Ramiro Morales</a>
+<a href="https://github.com/djheru">Philip Damra</a>
+<a href="https://github.com/fvieira">Francisco Jos&eacute; Marques Vieira</a>
+<a href="https://www.davidxia.com">David Xia</a>
+<a href="https://github.com/satoru">satoru</a>
+<a href="https://github.com/jsummerfield">James Summerfield</a>
+<a href="https://github.com/adaszko">Adam Szkoda</a>
+<a href="https://github.com/roysmith">Roy Smith</a>
+<a href="https://github.com/jianbin-netskope">Jianbin Wei</a>
+<a href="https://github.com/ToxicWar">Anton Larkin</a>
+<a href="https://github.com/matiasherranz-santex">Matias Herranz</a>
+<a href="http://www.bertera.it">Pietro Bertera</a></p>
 <p>Also thanks to Denis Bilenko for writing gevent and guidance in
 constructing this tutorial.</p>
 <p>This is a collaborative document published under MIT license.
 Have something to add? See a typo? Fork and issue a
 pull request <a href="https://github.com/sdiehl/gevent-tutorial">Github</a>.
 Any and all contributions are welcome.</p>
-<p>This page is also available in
-<a href="http://methane.github.com/gevent-tutorial-ja">Japanese</a>,
-<a href="http://xlambda.com/gevent-tutorial/">Chinese</a>,
-<a href="http://ovnicraft.github.io/gevent/">Spanish</a>,
-<a href="http://pbertera.github.io/gevent-tutorial-it/">Italian</a>,
-<a href="https://hellerve.github.io/gevent-tutorial-de">German</a> and
-<a href="http://leekchan.com/gevent-tutorial-ko/">Korean</a>
-.</p>
+<p>This page is also <a href="http://methane.github.com/gevent-tutorial-ja">available in Japanese</a> and <a href="http://pbertera.github.io/gevent-tutorial-it/">Italian</a>.</p>
 <h1 id="core">Core</h1>
 <h2 id="greenlets">Greenlets</h2>
 <p>The primary pattern used in gevent is the <strong>Greenlet</strong>, a
@@ -258,16 +271,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 0 done
 Task 1 done
-Task 3 done
-Task 4 done
 Task 5 done
+Task 6 done
+Task 2 done
+Task 4 done
 Task 7 done
 Task 8 done
-Task 2 done
-Task 6 done
 Task 9 done
+Task 0 done
+Task 3 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -682,6 +695,7 @@ from gevent.event import Event
 Illustrates the use of events
 '''
 
+
 evt = Event()
 
 def setter():
@@ -690,6 +704,7 @@ def setter():
     gevent.sleep(3)
     print("Ok, I'm done")
     evt.set()
+
 
 def waiter():
     '''After 3 seconds the get call will unblock'''
@@ -941,6 +956,7 @@ def hello_from(n):
 
 group.map(hello_from, xrange(3))
 
+
 def intensive(n):
     gevent.sleep(3 - n)
     return 'task', n
@@ -962,11 +978,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 4385850864
+Hello from Greenlet 4340152592
 Size of group 3
-Hello from Greenlet 4385850704
+Hello from Greenlet 4340928912
 Size of group 3
-Hello from Greenlet 4385852944
+Hello from Greenlet 4340928592
 Ordered
 ('task', 0)
 ('task', 1)
@@ -1151,6 +1167,7 @@ def application(environ, start_response):
 
 WSGIServer(('', 8000), application).serve_forever()
 
+
 <code>
 </pre>
 
@@ -1327,14 +1344,13 @@ distributed applications.</p>
 which being a Request-Response socket pair. A socket has two
 methods of interest <code>send</code> and <code>recv</code>, both of which are
 normally blocking operations. But this is remedied by a briliant
-library by <a href="https://github.com/traviscline">Travis Cline</a> which
-uses gevent.socket to poll ZeroMQ sockets in a non-blocking
-manner.  You can install gevent-zeromq from PyPi via:  <code>pip install
-gevent-zeromq</code></p>
+<a href="https://github.com/tmc/gevent-zeromq">library</a> (is now part of pyzmq)
+by <a href="https://github.com/tmc">Travis Cline</a> which uses gevent.socket
+to poll ZeroMQ sockets in a non-blocking manner.</p>
 <pre><code class="python">
-# Note: Remember to ``pip install pyzmq gevent_zeromq``
+# Note: Remember to ``pip install pyzmq``
 import gevent
-from gevent_zeromq import zmq
+import zmq.green as zmq
 
 # Global Context
 context = zmq.Context()
@@ -1521,6 +1537,7 @@ def ajax_endpoint(environ, start_response):
             yield json.dumps(datum) + '\n'
         except Empty:
             pass
+
 
 gevent.spawn(producer)
 

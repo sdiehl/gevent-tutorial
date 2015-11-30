@@ -23,6 +23,26 @@ In chronological order of contribution:
 [Eddie Hebert](https://github.com/ehebert)
 [Alexis Metaireau](http://notmyidea.org)
 [Daniel Velkov](https://github.com/djv)
+[Sean Wang](https://github.com/sww)
+[Inada Naoki](https://github.com/methane)
+[Balthazar Rouberol](https://github.com/brouberol)
+[Glen Baker](https://github.com/iepathos)
+[Jan-Philip Gehrcke](https://gehrcke.de)
+[Matthijs van der Vleuten](https://github.com/zr40)
+[Simon Hayward](http://simonsblog.co.uk)
+[Alexander James Phillips](https://github.com/AJamesPhillips)
+[Ramiro Morales](https://github.com/ramiro)
+[Philip Damra](https://github.com/djheru)
+[Francisco Jos&eacute; Marques Vieira](https://github.com/fvieira)
+[David Xia](https://www.davidxia.com)
+[satoru](https://github.com/satoru)
+[James Summerfield](https://github.com/jsummerfield)
+[Adam Szkoda](https://github.com/adaszko)
+[Roy Smith](https://github.com/roysmith)
+[Jianbin Wei](https://github.com/jianbin-netskope)
+[Anton Larkin](https://github.com/ToxicWar)
+[Matias Herranz](https://github.com/matiasherranz-santex)
+[Pietro Bertera](http://www.bertera.it)
 
 Also thanks to Denis Bilenko for writing gevent and guidance in
 constructing this tutorial.
@@ -1166,15 +1186,14 @@ ZeroMQ provides a variety of socket primitives, the simplest of
 which being a Request-Response socket pair. A socket has two
 methods of interest ``send`` and ``recv``, both of which are
 normally blocking operations. But this is remedied by a briliant
-library by [Travis Cline](https://github.com/traviscline) which
-uses gevent.socket to poll ZeroMQ sockets in a non-blocking
-manner.  You can install gevent-zeromq from PyPi via:  ``pip install
-gevent-zeromq``
+[library](https://github.com/tmc/gevent-zeromq) (is now part of PyZMQ)
+by [Travis Cline](https://github.com/tmc) which uses gevent.socket
+to poll ZeroMQ sockets in a non-blocking manner.
 
 [[[cog
-# Note: Remember to ``pip install pyzmq gevent_zeromq``
+# Note: Remember to ``pip install pyzmq``
 import gevent
-from gevent_zeromq import zmq
+import zmq.green as zmq
 
 # Global Context
 context = zmq.Context()
