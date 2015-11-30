@@ -216,7 +216,7 @@ import urllib2
 import simplejson as json
 
 def fetch(pid):
-    response = urllib2.urlopen('http://json-time.appspot.com/time.json')
+    response = urllib2.urlopen('http://jsontime.herokuapp.com/')
     result = response.read()
     json_result = json.loads(result)
     datetime = json_result['datetime']
