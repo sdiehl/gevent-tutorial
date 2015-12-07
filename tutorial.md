@@ -493,7 +493,7 @@ with Timeout(time_to_wait, TooLong):
 </pre>
 
 In addition, gevent also provides timeout arguments for a
-variety of Greenlet and data stucture related calls. For example:
+variety of Greenlet and data structure related calls. For example:
 
 [[[cog
 import gevent
@@ -569,7 +569,7 @@ function select at 0x1924de8
 
 Python's runtime allows for most objects to be modified at runtime
 including modules, classes, and even functions. This is generally an
-astoudingly bad idea since it creates an "implicit side-effect" that is
+astoundingly bad idea since it creates an "implicit side-effect" that is
 most often extremely difficult to debug if problems occur, nevertheless
 in extreme situations where a library needs to alter the fundamental
 behavior of Python itself monkey patches can be used. In this case gevent
@@ -1178,7 +1178,7 @@ distributed applications.
 ZeroMQ provides a variety of socket primitives, the simplest of
 which being a Request-Response socket pair. A socket has two
 methods of interest ``send`` and ``recv``, both of which are
-normally blocking operations. But this is remedied by a briliant
+normally blocking operations. But this is remedied by a brilliant
 [library](https://github.com/tmc/gevent-zeromq) (is now part of PyZMQ)
 by [Travis Cline](https://github.com/tmc) which uses gevent.socket
 to poll ZeroMQ sockets in a non-blocking manner.
