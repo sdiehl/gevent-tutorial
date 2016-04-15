@@ -167,7 +167,7 @@ def task(pid):
     print('Task %s done' % pid)
 
 def synchronous():
-    for i in range(1,10):
+    for i in xrange(10):
         task(i)
 
 def asynchronous():
