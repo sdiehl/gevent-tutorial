@@ -745,10 +745,12 @@ def boss():
     """
 
     for i in xrange(1,10):
+        print('Assigned work %s in iteration 1' % (i))
         tasks.put(i)
     print('Assigned all work in iteration 1')
 
     for i in xrange(10,20):
+        print('Assigned work %s in iteration 2' % (i))
         tasks.put(i)
     print('Assigned all work in iteration 2')
 
