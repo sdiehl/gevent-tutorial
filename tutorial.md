@@ -1118,7 +1118,7 @@ class Actor(gevent.Greenlet):
 
     def __init__(self):
         self.inbox = Queue()
-        Greenlet.__init__(self)
+        gevent.Greenlet.__init__(self)
 
     def receive(self, message):
         """
