@@ -890,7 +890,7 @@ releases its acquisition.
 [[[cog
 from gevent import sleep
 from gevent.pool import Pool
-from gevent.coros import BoundedSemaphore
+from gevent.lock import BoundedSemaphore
 
 sem = BoundedSemaphore(2)
 
