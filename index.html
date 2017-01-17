@@ -244,7 +244,7 @@ def task(pid):
     print('Task %s done' % pid)
 
 def synchronous():
-    for i in range(1,10):
+    for i in xrange(10):
         task(i)
 
 def asynchronous():
@@ -261,6 +261,7 @@ asynchronous()
 <p></code>
 <pre><code class="python">
 Synchronous:
+Task 0 done
 Task 1 done
 Task 2 done
 Task 3 done
@@ -271,16 +272,16 @@ Task 7 done
 Task 8 done
 Task 9 done
 Asynchronous:
-Task 7 done
+Task 1 done
+Task 6 done
+Task 0 done
+Task 3 done
 Task 4 done
 Task 5 done
-Task 8 done
+Task 7 done
 Task 9 done
-Task 0 done
-Task 1 done
 Task 2 done
-Task 3 done
-Task 6 done
+Task 8 done
 </pre></code></p>
 <p>In the synchronous case all the tasks are run sequentially,
 which results in the main programming <em>blocking</em> (
@@ -590,7 +591,7 @@ with Timeout(time_to_wait, TooLong):
 </pre>
 
 <p>In addition, gevent also provides timeout arguments for a
-variety of Greenlet and data stucture related calls. For example:</p>
+variety of Greenlet and data structure related calls. For example:</p>
 <pre><code class="python">
 import gevent
 from gevent import Timeout
@@ -668,7 +669,7 @@ function select at 0x1924de8
 
 <p>Python's runtime allows for most objects to be modified at runtime
 including modules, classes, and even functions. This is generally an
-astoudingly bad idea since it creates an "implicit side-effect" that is
+astoundingly bad idea since it creates an "implicit side-effect" that is
 most often extremely difficult to debug if problems occur, nevertheless
 in extreme situations where a library needs to alter the fundamental
 behavior of Python itself monkey patches can be used. In this case gevent
@@ -858,10 +859,12 @@ def boss():
     """
 
     for i in xrange(1,10):
+        print('Assigned work %s in iteration 1' % (i))
         tasks.put(i)
     print('Assigned all work in iteration 1')
 
     for i in xrange(10,20):
+        print('Assigned work %s in iteration 2' % (i))
         tasks.put(i)
     print('Assigned all work in iteration 2')
 
@@ -875,22 +878,41 @@ gevent.joinall([
 
 <p></code>
 <pre><code class="python">
+Assigned work 1 in iteration 1
+Assigned work 2 in iteration 1
+Assigned work 3 in iteration 1
+Assigned work 4 in iteration 1
 Worker steve got task 1
 Worker john got task 2
 Worker bob got task 3
+Assigned work 5 in iteration 1
+Assigned work 6 in iteration 1
+Assigned work 7 in iteration 1
 Worker steve got task 4
 Worker john got task 5
 Worker bob got task 6
+Assigned work 8 in iteration 1
+Assigned work 9 in iteration 1
 Assigned all work in iteration 1
+Assigned work 10 in iteration 2
 Worker steve got task 7
 Worker john got task 8
 Worker bob got task 9
+Assigned work 11 in iteration 2
+Assigned work 12 in iteration 2
+Assigned work 13 in iteration 2
 Worker steve got task 10
 Worker john got task 11
 Worker bob got task 12
+Assigned work 14 in iteration 2
+Assigned work 15 in iteration 2
+Assigned work 16 in iteration 2
 Worker steve got task 13
 Worker john got task 14
 Worker bob got task 15
+Assigned work 17 in iteration 2
+Assigned work 18 in iteration 2
+Assigned work 19 in iteration 2
 Worker steve got task 16
 Worker john got task 17
 Worker bob got task 18
@@ -975,11 +997,11 @@ for i in igroup.imap_unordered(intensive, xrange(3)):
 <p></code>
 <pre><code class="python">
 Size of group 3
-Hello from Greenlet 139643393732848
+Hello from Greenlet 4405439216
 Size of group 3
-Hello from Greenlet 139643393733968
+Hello from Greenlet 4405439056
 Size of group 3
-Hello from Greenlet 139643393733488
+Hello from Greenlet 4405440336
 Ordered
 ('task', 0)
 ('task', 1)
@@ -1339,11 +1361,10 @@ distributed applications.</p>
 <p>ZeroMQ provides a variety of socket primitives, the simplest of
 which being a Request-Response socket pair. A socket has two
 methods of interest <code>send</code> and <code>recv</code>, both of which are
-normally blocking operations. But this is remedied by a briliant
-library by <a href="https://github.com/traviscline">Travis Cline</a> which
-uses gevent.socket to poll ZeroMQ sockets in a non-blocking
-manner.  You can install gevent-zeromq from PyPi via:  <code>pip install
-gevent-zeromq</code></p>
+normally blocking operations. But this is remedied by a brilliant
+<a href="https://github.com/tmc/gevent-zeromq">library</a> (is now part of PyZMQ)
+by <a href="https://github.com/tmc">Travis Cline</a> which uses gevent.socket
+to poll ZeroMQ sockets in a non-blocking manner.</p>
 <pre><code class="python">
 # Note: Remember to ``pip install pyzmq``
 import gevent
