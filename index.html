@@ -147,7 +147,7 @@ are truly parallel.</p>
 into a collection of subtasks which are scheduled to run simultaneously
 or <em>asynchronously</em>, instead of one at a time or <em>synchronously</em>. A
 switch between the two subtasks is known as a <em>context switch</em>.</p>
-<p>A context switch in gevent is done through <em>yielding</em>. In this 
+<p>A context switch in gevent is done through <em>yielding</em>. In this
 example we have two contexts which yield to each other through invoking
 <code>gevent.sleep(0)</code>.</p>
 <pre><code class="python">
@@ -1564,7 +1564,7 @@ WSGIServer(('', 8000), ajax_endpoint).serve_forever()
 </pre>
 
 <h2 id="websockets">Websockets</h2>
-<p>Websocket example which requires <a href="https://bitbucket.org/Jeffrey/gevent-websocket/src">gevent-websocket</a>.</p>
+<p>Websocket example which requires <a href="https://bitbucket.org/noppo/gevent-websocket/src">gevent-websocket</a>.</p>
 <pre>
 <code class="python"># Simple gevent-websocket server
 import json
