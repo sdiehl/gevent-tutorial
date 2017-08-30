@@ -77,7 +77,7 @@ into a collection of subtasks which are scheduled to run simultaneously
 or *asynchronously*, instead of one at a time or *synchronously*. A
 switch between the two subtasks is known as a *context switch*.
 
-A context switch in gevent is done through *yielding*. In this 
+A context switch in gevent is done through *yielding*. In this
 example we have two contexts which yield to each other through invoking
 ``gevent.sleep(0)``.
 
@@ -434,7 +434,7 @@ This results in so called "zombie processes" which need to be
 killed from outside of the Python interpreter.
 
 A common pattern is to listen SIGQUIT events on the main program
-and to invoke ``gevent.shutdown`` before exit.
+and to invoke ``gevent.kill`` or ``gevent.killall`` before exit.
 
 <pre>
 <code class="python">import gevent
@@ -444,8 +444,8 @@ def run_forever():
     gevent.sleep(1000)
 
 if __name__ == '__main__':
-    gevent.signal(signal.SIGQUIT, gevent.kill)
     thread = gevent.spawn(run_forever)
+    gevent.signal(signal.SIGQUIT, gevent.kill, thread)
     thread.join()
 </code>
 </pre>
