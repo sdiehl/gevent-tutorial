@@ -1379,7 +1379,7 @@ WSGIServer(('', 8000), ajax_endpoint).serve_forever()
 
 ## Websockets
 
-Websocket example which requires <a href="https://bitbucket.org/Jeffrey/gevent-websocket/src">gevent-websocket</a>.
+Websocket example which requires <a href="https://bitbucket.org/noppo/gevent-websocket/src">gevent-websocket</a>.
 
 
 <pre>
