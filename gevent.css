@@ -17,6 +17,7 @@
 
 a {
     color: inherit;
+    text-decoration:none;
 }
 
 pre {
@@ -40,7 +41,7 @@ p code, li code {
     display: block;
     margin-bottom: 0px;
     padding: 0px;
-    font-family: sans;
+    font-family: monospace;
     font-weight: bold;
     width: 200px;
     padding: 0.5em;
@@ -52,7 +53,7 @@ p code, li code {
 
 h1 {
     text-align: center;
-    padding-bottom: 5px;
+    padding-bottom: 6px;
     margin-top: 50px;
     margin-bottom: 50px;
 }
