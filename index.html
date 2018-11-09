@@ -536,7 +536,7 @@ SIGQUIT may hold the program's execution longer than expected.
 This results in so called "zombie processes" which need to be
 killed from outside of the Python interpreter.</p>
 <p>A common pattern is to listen SIGQUIT events on the main program
-and to invoke <code>gevent.shutdown</code> before exit.</p>
+and to invoke <code>gevent.kill</code> or <code>gevent.killall</code> before exit.</p>
 <pre>
 <code class="python">import gevent
 import signal
@@ -545,8 +545,8 @@ def run_forever():
     gevent.sleep(1000)
 
 if __name__ == '__main__':
-    gevent.signal(signal.SIGQUIT, gevent.kill)
     thread = gevent.spawn(run_forever)
+    gevent.signal(signal.SIGQUIT, gevent.kill, thread)
     thread.join()
 </code>
 </pre>
