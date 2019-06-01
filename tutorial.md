@@ -251,10 +251,10 @@ multiprocessing pool and compare its results to the one of a gevent pool.
 
 <pre>
 <code class="python">
-import time
+import gevent
 
 def echo(i):
-    time.sleep(0.001)
+    gevent.sleep(0.001)
     return i
 
 # Non Deterministic Process Pool
