@@ -4,8 +4,10 @@ Online Version: http://sdiehl.github.com/gevent-tutorial/
 Want to add an example. Its uber simple.
 
 1. Fork the repo.
-2. ``pip install -r requirements.txt``
-3. Edit ``tutorial.md``.
+2. Create a virtual environment using [virtualenv](https://pypi.org/project/virtualenv/) package by 
+running `virtualenv venv` and activate it. You can follow the documentation if you don't know how to use it.
+3. ``pip install -r requirements.txt``
+4. Edit ``tutorial.md``.
 
 Add your text as Markdown.
 
@@ -43,9 +45,9 @@ Will output this as html:
     </code>
     </pre>
 
-4. Run ``./build``
-5. Issue pull request.
-6. Get good gevent karma.
+5. Run ``python build``
+6. Issue pull request.
+7. Get good gevent karma.
 
 Released under MIT License.
 

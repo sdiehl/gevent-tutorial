@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 
-import re
-import os
-import sys
 import codecs
-import markdown
-from cStringIO import StringIO
-from cogapp import Cog
-from jinja2 import Template
+import os
+import re
+import sys
+from io import StringIO
 
+import markdown
+from cogapp import Cog
 from jinja2 import Environment, FileSystemLoader
 
 OUTPUT = 'index.html'
@@ -35,8 +34,8 @@ start_code = """<pre><code class="python">"""
 end_code = """</pre></code>"""
 
 r1 = re.sub('\[\[\[end\]\]\]', end_code, cogged)
-r2 = re.sub(r'\[\[\[cog',start_code, r1)
-r3 = re.sub(r'\]\]\]',end_code + '\n' + start_code, r2)
+r2 = re.sub(r'\[\[\[cog', start_code, r1)
+r3 = re.sub(r'\]\]\]', end_code + '\n' + start_code, r2)
 
 rendered_code = r3
 
@@ -44,4 +43,4 @@ body = markdown.markdown(rendered_code, extensions=['toc'])
 
 with open(OUTPUT, 'w+') as f:
     f.write(template.render(body=body))
-print 'Wrote', OUTPUT
+print('Wrote', OUTPUT)
